@@ -1,0 +1,97 @@
+#! /usr/bin/env node
+
+/*************************************************************************
+ *
+ *  mj3-mml2html
+ *
+ *  Uses MathJax v3 to convert a MathML string to an HTML string.
+ *
+ * ----------------------------------------------------------------------
+ *
+ *  Copyright (c) 2018 The MathJax Consortium
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+//
+//  Get the command-line arguments
+//
+var argv = require('yargs')
+  .demand(0).strict()
+  .usage('$0 [options] "math" > file.html')
+  .options({
+    em: {
+      default: 16,
+      describe: 'em-size in pixels'
+    },
+    ex: {
+      default: 8,
+      describe: 'ex-size in pixels'
+    },
+    width: {
+      default: 80 * 16,
+      describe: 'width of container in pixles'
+    },
+    css: {
+      boolean: true,
+      describe: 'output the required CSS rather than the HTML itself'
+    },
+    fontURL: {
+      default: 'https://cdn.rawgit.com/mathjax/mathjax-v3/3.0.0-beta.1/mathjax2/css',
+      describe: 'the URL to use for web fonts'
+    }
+  })
+  .argv;
+
+//
+//  Load the packages needed for MathJax
+//
+const MathML = require('mathjax3/mathjax3/input/mathml.js').MathML;
+const CHTML = require('mathjax3/mathjax3/output/chtml.js').CHTML;
+const HTMLMathItem = require('mathjax3/mathjax3/handlers/html/HTMLMathItem.js').HTMLMathItem;
+const HTMLDocument = require('mathjax3/mathjax3/handlers/html/HTMLDocument.js').HTMLDocument;
+const liteAdaptor = require('mathjax3/mathjax3/adaptors/liteAdaptor.js').liteAdaptor;
+const LiteDocument = require('mathjax3/mathjax3/adaptors/lite/Document.js').LiteDocument;
+
+//
+//  Create the input and ouptut jax
+//
+const mml = new MathML();
+const chtml = new CHTML({fontURL: argv.fontURL});
+
+//
+//  Create an HTML document using a LiteDocument and the input and output jax
+//
+const adaptor = liteAdaptor();
+const html = new HTMLDocument(new LiteDocument(), adaptor, {InputJax: mml, OutputJax: chtml});
+
+//
+//  Typeset a MathML string and return the serialized HTML
+//
+const Typeset = (string, em = 16, ex = 8, cwidth = 80*16) => {
+    const math = new HTMLMathItem(string, mml);
+    math.setMetrics(em, ex, cwidth, 100000, 1);
+    math.compile();
+    math.typeset(html)
+    return adaptor.outerHTML(math.typesetRoot);
+};
+
+//
+//  If the --css option was specified, output the CSS,
+//  Otherwise, typeset the math and output the HTML
+//
+if (argv.css) {
+  console.log(adaptor.textContent(chtml.styleSheet(html)));
+} else {
+  console.log(Typeset(argv._[0] || '', argv.em, argv.ex, argv.width));
+}

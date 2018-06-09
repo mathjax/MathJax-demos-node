@@ -1,0 +1,20 @@
+{
+  "name": "mj3-demos-node",
+  "version": "3.0.0-beta.1",
+  "description": "Demos using MathJax v3 beta in NodeJS",
+  "dependencies": {
+    "mathjax3": "git+https://github.com/mathjax/mathjax-v3.git#beta",
+    "yargs": "^11.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mathjax/mj3-demos-node/"
+  },
+  "keywords": [
+    "MathJax"
+  ],
+  "license": "Apache-2.0",
+  "scripts": {
+    "postinstall": "cd node_modules/mathjax3 && npm install && echo 'Compiling mathjax3' && npx tsc"
+  }
+}
