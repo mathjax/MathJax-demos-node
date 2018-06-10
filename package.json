@@ -3,7 +3,7 @@
   "version": "3.0.0-beta.1",
   "description": "Demos using MathJax v3 beta in NodeJS",
   "dependencies": {
-    "mathjax3": "git+https://github.com/mathjax/mathjax-v3.git#beta",
+    "mathjax3": "^3.0.0-beta.1",
     "yargs": "^11.0.0"
   },
   "repository": {
@@ -13,8 +13,5 @@
   "keywords": [
     "MathJax"
   ],
-  "license": "Apache-2.0",
-  "scripts": {
-    "postinstall": "cd node_modules/mathjax3 && npm install && echo 'Compiling mathjax3' && npx tsc"
-  }
+  "license": "Apache-2.0"
 }
