@@ -14,9 +14,12 @@ This repository contains three samples files:
 
 * `mj3-tex2html` for converting TeX expressions to serialized HTML (and obtaining the necessary CSS styles).
 * `mj3-mml2html` for converting MathML expressions to serialzied HTML (and obtaining the necessary CSS styles).
-* `mjs-tex2mml` for converting TeX expressions to serialzied MathML.
+* `mj3-tex2mml` for converting TeX expressions to serialzied MathML.
+* `mj3-tex2html-page` for converting a full HTML page with TeX notation to its final form with CommonHTML output.
 
 These can be run from the command line.  Use the `--help` option to get the format and list of available options for each command.
+
+Note: For the `mj3-tex2html-page` program, you may want to install jsdom (`npm install jsdom`) and use the `jsdomAdaptor` instead of the more limited `liteAdaptor` for a more robust command.  See the comments in the file for more details.
 
 These files act as examples of how to call MathJax version 3 from within your NodeJS programs.
 
