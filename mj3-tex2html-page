@@ -4,7 +4,7 @@
  *
  *  mj3-tex2html
  *
- *  Uses MathJax v3 to convert a TeX string to an HTML string.
+ *  Uses MathJax v3 to convert all TeX in an HTML document.
  *
  * ----------------------------------------------------------------------
  *
@@ -27,13 +27,9 @@
 //  Get the command-line arguments
 //
 var argv = require('yargs')
-  .demand(0).strict()
-  .usage('$0 [options] "math" > file.html')
+  .demand(1).strict()
+  .usage('$0 [options] file.html > converted.html')
   .options({
-    inline: {
-      boolean: true,
-      describe: "process as display math"
-    },
     em: {
       default: 16,
       describe: 'em-size in pixels'
@@ -42,17 +38,9 @@ var argv = require('yargs')
       default: 8,
       describe: 'ex-size in pixels'
     },
-    width: {
-      default: 80 * 16,
-      describe: 'width of container in pixels'
-    },
     packages: {
       default: 'base, ams, noundefined, newcommand, boldsymbol',
       describe: 'the packages to use, e.g. "base, ams"'
-    },
-    css: {
-      boolean: true,
-      describe: 'output the required CSS rather than the HTML itself'
     },
     fontURL: {
       default: 'https://cdn.rawgit.com/mathjax/mathjax-v3/3.0.0-beta.1/mathjax2/css',
@@ -61,15 +49,14 @@ var argv = require('yargs')
   })
   .argv;
 
+const fs = require('fs');
+
 //
 //  Load the packages needed for MathJax
 //
+const MathJax = require('mathjax3/mathjax3/mathjax.js').MathJax;
 const TeX = require('mathjax3/mathjax3/input/tex.js').TeX;
 const CHTML = require('mathjax3/mathjax3/output/chtml.js').CHTML;
-const HTMLMathItem = require('mathjax3/mathjax3/handlers/html/HTMLMathItem.js').HTMLMathItem;
-const HTMLDocument = require('mathjax3/mathjax3/handlers/html/HTMLDocument.js').HTMLDocument;
-const liteAdaptor = require('mathjax3/mathjax3/adaptors/liteAdaptor.js').liteAdaptor;
-const LiteDocument = require('mathjax3/mathjax3/adaptors/lite/Document.js').LiteDocument;
 
 require('mathjax3/mathjax3/input/tex/base/BaseConfiguration.js');
 require('mathjax3/mathjax3/input/tex/ams/AmsConfiguration.js');
@@ -78,34 +65,50 @@ require('mathjax3/mathjax3/input/tex/newcommand/NewcommandConfiguration.js');
 require('mathjax3/mathjax3/input/tex/boldsymbol/BoldsymbolConfiguration.js');
 
 //
-//  Create the input and ouptut jax
+//  Create DOM adaptor and register it for HTML documents
+//
+const adaptor = require('mathjax3/mathjax3/adaptors/liteAdaptor.js').liteAdaptor({fontSize: argv.em});
+require('mathjax3/mathjax3/handlers/html.js').RegisterHTMLHandler(adaptor);
+
+//
+//  Work around bug in liteAdaptor (https://github.com/mathjax/mathjax-v3/issues/127).
+//  This will be fixed in the next release.
+//
+//  Alternatively, install jsdom (npm install jsdom) and use the jsdomAdaptor above instead
+//
+const LiteParser = require('mathjax3/mathjax3/adaptors/lite/Parser.js').LiteParser;
+class myParser extends LiteParser {
+    serializeInner(adaptor, node) {
+       if (LiteParser.PCDATA.hasOwnProperty(node.kind)) {
+         return node.children.map(x => x.value).join('');
+       }
+       return super.serializeInner(adaptor, node);
+    }
+}
+adaptor.parser = new myParser();
+
+//
+//  Read the HTML file
+//
+const htmlfile = fs.readFileSync(argv._[0], 'utf8');
+
+//
+//  Create input and output jax and a document using them on the content from the HTML file
 //
 const tex = new TeX({packages: argv.packages.split(/\s*,\s*/)});
-const chtml = new CHTML({fontURL: argv.fontURL});
+const chtml = new CHTML({fontURL: argv.fontURL, exFactor: argv.ex / argv.em});
+const html = MathJax.document(htmlfile, {InputJax: tex, OutputJax: chtml});
 
 //
-//  Create an HTML document using a LiteDocument and the input and output jax
+//  Typeset the document
 //
-const adaptor = liteAdaptor();
-const html = new HTMLDocument(new LiteDocument(), adaptor, {InputJax: tex, OutputJax: chtml});
+html.findMath()
+    .compile()
+    .getMetrics()
+    .typeset()
+    .updateDocument();
 
 //
-//  Typeset a TeX string and return the serialized HTML
+//  Output the resulting HTML and fix the &gt; in the style elements (liteAdaptor bug);
 //
-const Typeset = (string, display, em = 16, ex = 8, cwidth = 80*16) => {
-    const math = new HTMLMathItem(string, tex, display);
-    math.setMetrics(em, ex, cwidth, 100000, 1);
-    math.compile();
-    math.typeset(html)
-    return adaptor.outerHTML(math.typesetRoot);
-};
-
-//
-//  If the --css option was specified, output the CSS,
-//  Otherwise, typeset the math and output the HTML
-//
-if (argv.css) {
-  console.log(adaptor.textContent(chtml.styleSheet(html)));
-} else {
-  console.log(Typeset(argv._[0] || '', !argv.inline, argv.em, argv.ex, argv.width));
-}
+console.log(adaptor.outerHTML(adaptor.parent(adaptor.body(html.document))));

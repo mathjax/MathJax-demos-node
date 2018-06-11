@@ -40,7 +40,7 @@ var argv = require('yargs')
     },
     width: {
       default: 80 * 16,
-      describe: 'width of container in pixles'
+      describe: 'width of container in pixels'
     },
     css: {
       boolean: true,
