@@ -2,7 +2,7 @@
 
 /*************************************************************************
  *
- *  mj3-tex2html
+ *  mj3-tex2html-page
  *
  *  Uses MathJax v3 to convert all TeX in an HTML document.
  *
