@@ -2,9 +2,9 @@
 
 /*************************************************************************
  *
- *  mj3-tex2html
+ *  mj3-tex2svg
  *
- *  Uses MathJax v3 to convert a TeX string to an HTML string.
+ *  Uses MathJax v3 to convert a TeX string to an SVG string.
  *
  * ----------------------------------------------------------------------
  *
@@ -52,11 +52,7 @@ var argv = require('yargs')
     },
     css: {
       boolean: true,
-      describe: 'output the required CSS rather than the HTML itself'
-    },
-    fontURL: {
-      default: 'https://cdn.rawgit.com/mathjax/mathjax-v3/3.0.0-beta.2/mathjax2/css',
-      describe: 'the URL to use for web fonts'
+      describe: 'output the required CSS rather than the SVG itself'
     }
   })
   .argv;
@@ -65,7 +61,7 @@ var argv = require('yargs')
 //  Load the packages needed for MathJax
 //
 const TeX = require('mathjax3/mathjax3/input/tex.js').TeX;
-const CHTML = require('mathjax3/mathjax3/output/chtml.js').CHTML;
+const SVG = require('mathjax3/mathjax3/output/svg.js').SVG;
 const HTMLMathItem = require('mathjax3/mathjax3/handlers/html/HTMLMathItem.js').HTMLMathItem;
 const HTMLDocument = require('mathjax3/mathjax3/handlers/html/HTMLDocument.js').HTMLDocument;
 const liteAdaptor = require('mathjax3/mathjax3/adaptors/liteAdaptor.js').liteAdaptor;
@@ -84,13 +80,13 @@ require('mathjax3/mathjax3/input/tex/physics/PhysicsConfiguration.js');
 //  Create the input and ouptut jax
 //
 const tex = new TeX({packages: argv.packages.split(/\s*,\s*/)});
-const chtml = new CHTML({fontURL: argv.fontURL});
+const svg = new SVG();
 
 //
 //  Create an HTML document using a LiteDocument and the input and output jax
 //
 const adaptor = liteAdaptor();
-const html = new HTMLDocument(new LiteDocument(), adaptor, {InputJax: tex, OutputJax: chtml});
+const html = new HTMLDocument(new LiteDocument(), adaptor, {InputJax: tex, OutputJax: svg});
 
 //
 //  Typeset a TeX string and return the serialized HTML
@@ -105,10 +101,10 @@ const Typeset = (string, display, em = 16, ex = 8, cwidth = 80*16) => {
 
 //
 //  If the --css option was specified, output the CSS,
-//  Otherwise, typeset the math and output the HTML
+//  Otherwise, typeset the math and output the SVG
 //
 if (argv.css) {
-  console.log(adaptor.textContent(chtml.styleSheet(html)));
+  console.log(adaptor.textContent(svg.styleSheet(html)));
 } else {
   console.log(Typeset(argv._[0] || '', !argv.inline, argv.em, argv.ex, argv.width));
 }

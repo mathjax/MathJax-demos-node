@@ -43,7 +43,7 @@ var argv = require('yargs')
       describe: 'the packages to use, e.g. "base, ams"'
     },
     fontURL: {
-      default: 'https://cdn.rawgit.com/mathjax/mathjax-v3/3.0.0-beta.1/mathjax2/css',
+      default: 'https://cdn.rawgit.com/mathjax/mathjax-v3/3.0.0-beta.2/mathjax2/css',
       describe: 'the URL to use for web fonts'
     }
   })
@@ -63,29 +63,15 @@ require('mathjax3/mathjax3/input/tex/ams/AmsConfiguration.js');
 require('mathjax3/mathjax3/input/tex/noundefined/NoUndefinedConfiguration.js');
 require('mathjax3/mathjax3/input/tex/newcommand/NewcommandConfiguration.js');
 require('mathjax3/mathjax3/input/tex/boldsymbol/BoldsymbolConfiguration.js');
+require('mathjax3/mathjax3/input/tex/braket/BraketConfiguration.js');
+require('mathjax3/mathjax3/input/tex/mhchem/MhchemConfiguration.js');
+require('mathjax3/mathjax3/input/tex/physics/PhysicsConfiguration.js');
 
 //
 //  Create DOM adaptor and register it for HTML documents
 //
 const adaptor = require('mathjax3/mathjax3/adaptors/liteAdaptor.js').liteAdaptor({fontSize: argv.em});
 require('mathjax3/mathjax3/handlers/html.js').RegisterHTMLHandler(adaptor);
-
-//
-//  Work around bug in liteAdaptor (https://github.com/mathjax/mathjax-v3/issues/127).
-//  This will be fixed in the next release.
-//
-//  Alternatively, install jsdom (npm install jsdom) and use the jsdomAdaptor above instead
-//
-const LiteParser = require('mathjax3/mathjax3/adaptors/lite/Parser.js').LiteParser;
-class myParser extends LiteParser {
-    serializeInner(adaptor, node) {
-       if (LiteParser.PCDATA.hasOwnProperty(node.kind)) {
-         return node.children.map(x => x.value).join('');
-       }
-       return super.serializeInner(adaptor, node);
-    }
-}
-adaptor.parser = new myParser();
 
 //
 //  Read the HTML file
@@ -109,6 +95,6 @@ html.findMath()
     .updateDocument();
 
 //
-//  Output the resulting HTML and fix the &gt; in the style elements (liteAdaptor bug);
+//  Output the resulting HTML
 //
 console.log(adaptor.outerHTML(adaptor.parent(adaptor.body(html.document))));
