@@ -35,7 +35,7 @@ var argv = require('yargs')
       describe: "process as display math"
     },
     packages: {
-      default: 'base, ams, noundefined, newcommand, boldsymbol, braket, mhchem, physics',
+      default: 'base, ams, noundefined, newcommand, boldsymbol, braket, mhchem, physics, verb, cancel, enclose',
       describe: 'the packages to use, e.g. "base, ams"'
     }
   })
@@ -56,6 +56,9 @@ require('mathjax3/mathjax3/input/tex/boldsymbol/BoldsymbolConfiguration.js');
 require('mathjax3/mathjax3/input/tex/braket/BraketConfiguration.js');
 require('mathjax3/mathjax3/input/tex/mhchem/MhchemConfiguration.js');
 require('mathjax3/mathjax3/input/tex/physics/PhysicsConfiguration.js');
+require('mathjax3/mathjax3/input/tex/verb/VerbConfiguration.js');
+require('mathjax3/mathjax3/input/tex/cancel/CancelConfiguration.js');
+require('mathjax3/mathjax3/input/tex/enclose/EncloseConfiguration.js');
 
 const MmlVisitor = require('mathjax3/mathjax3/core/MmlTree/SerializedMmlVisitor.js').SerializedMmlVisitor;
 
