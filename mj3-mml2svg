@@ -54,10 +54,8 @@ var argv = require('yargs')
 //
 const MathML = require('mathjax3/mathjax3/input/mathml.js').MathML;
 const SVG = require('mathjax3/mathjax3/output/svg.js').SVG;
-const HTMLMathItem = require('mathjax3/mathjax3/handlers/html/HTMLMathItem.js').HTMLMathItem;
 const HTMLDocument = require('mathjax3/mathjax3/handlers/html/HTMLDocument.js').HTMLDocument;
 const liteAdaptor = require('mathjax3/mathjax3/adaptors/liteAdaptor.js').liteAdaptor;
-const LiteDocument = require('mathjax3/mathjax3/adaptors/lite/Document.js').LiteDocument;
 
 //
 //  Create the input and ouptut jax
@@ -69,15 +67,15 @@ const svg = new SVG();
 //  Create an HTML document using a LiteDocument and the input and output jax
 //
 const adaptor = liteAdaptor();
-const html = new HTMLDocument(new LiteDocument(), adaptor, {InputJax: mml, OutputJax: svg});
+const html = new HTMLDocument('', adaptor, {InputJax: mml, OutputJax: svg});
 
 //
 //  Typeset a MathML string and return the serialized HTML
 //
 const Typeset = (string, em = 16, ex = 8, cwidth = 80*16) => {
-    const math = new HTMLMathItem(string, mml);
+    const math = new html.options.MathItem(string, mml);
     math.setMetrics(em, ex, cwidth, 100000, 1);
-    math.compile();
+    math.compile(html);
     math.typeset(html)
     return adaptor.outerHTML(math.typesetRoot);
 };

@@ -24,6 +24,15 @@
  */
 
 //
+//  Load the packages needed for MathJax
+//
+const TeX = require('mathjax3/mathjax3/input/tex.js').TeX;
+const HTMLDocument = require('mathjax3/mathjax3/handlers/html/HTMLDocument.js').HTMLDocument;
+const liteAdaptor = require('mathjax3/mathjax3/adaptors/liteAdaptor.js').liteAdaptor;
+
+const AllPackages = require('mathjax3/mathjax3/input/tex/AllPackages.js').AllPackages;
+
+//
 //  Get the command-line arguments
 //
 var argv = require('yargs')
@@ -35,56 +44,35 @@ var argv = require('yargs')
       describe: "process as display math"
     },
     packages: {
-      default: 'base, ams, noundefined, newcommand, boldsymbol, braket, mhchem, physics, verb, cancel, enclose',
+      default: AllPackages.sort().join(', '),
       describe: 'the packages to use, e.g. "base, ams"'
     }
   })
   .argv;
 
 //
-//  Load the packages needed for MathJax
-//
-const TeX = require('mathjax3/mathjax3/input/tex.js').TeX;
-const AbstractMathItem = require('mathjax3/mathjax3/core/MathItem.js').AbstractMathItem;
-const LiteDocument = require('mathjax3/mathjax3/adaptors/lite/Document.js').LiteDocument;
-
-require('mathjax3/mathjax3/input/tex/base/BaseConfiguration.js');
-require('mathjax3/mathjax3/input/tex/ams/AmsConfiguration.js');
-require('mathjax3/mathjax3/input/tex/noundefined/NoUndefinedConfiguration.js');
-require('mathjax3/mathjax3/input/tex/newcommand/NewcommandConfiguration.js');
-require('mathjax3/mathjax3/input/tex/boldsymbol/BoldsymbolConfiguration.js');
-require('mathjax3/mathjax3/input/tex/braket/BraketConfiguration.js');
-require('mathjax3/mathjax3/input/tex/mhchem/MhchemConfiguration.js');
-require('mathjax3/mathjax3/input/tex/physics/PhysicsConfiguration.js');
-require('mathjax3/mathjax3/input/tex/verb/VerbConfiguration.js');
-require('mathjax3/mathjax3/input/tex/cancel/CancelConfiguration.js');
-require('mathjax3/mathjax3/input/tex/enclose/EncloseConfiguration.js');
-
-const MmlVisitor = require('mathjax3/mathjax3/core/MmlTree/SerializedMmlVisitor.js').SerializedMmlVisitor;
-
-//
-//  A generic math item
-//
-class GenericMathItem extends AbstractMathItem {};
-
-//
-//  Create the input jax and document
+//  Create the input jax
 //
 const tex = new TeX({packages: argv.packages.split(/\s*,\s*/)});
-const document = new LiteDocument();
+
+//
+//  Create an HTML document using a LiteDocument and the input jax
+//
+const html = new HTMLDocument('', liteAdaptor(), {InputJax: tex});
 
 //
 //  Create a MathML serializer
 //
+const MmlVisitor = require('mathjax3/mathjax3/core/MmlTree/SerializedMmlVisitor.js').SerializedMmlVisitor;
 const visitor = new MmlVisitor();
-const toMathML = (node => visitor.visitTree(node, document));
+const toMathML = (node => visitor.visitTree(node, html));
 
 //
 //  Typeset a TeX string and return the serialized MathML
 //
 const Typeset = (string, display) => {
-    const math = new GenericMathItem(string, tex, display);
-    math.compile();
+    const math = new html.options.MathItem(string, tex, display);
+    math.compile(html);
     return toMathML(math.root);
 };
 

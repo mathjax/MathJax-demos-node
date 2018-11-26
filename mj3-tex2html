@@ -24,6 +24,16 @@
  */
 
 //
+//  Load the packages needed for MathJax
+//
+const TeX = require('mathjax3/mathjax3/input/tex.js').TeX;
+const CHTML = require('mathjax3/mathjax3/output/chtml.js').CHTML;
+const HTMLDocument = require('mathjax3/mathjax3/handlers/html/HTMLDocument.js').HTMLDocument;
+const liteAdaptor = require('mathjax3/mathjax3/adaptors/liteAdaptor.js').liteAdaptor;
+
+const AllPackages = require('mathjax3/mathjax3/input/tex/AllPackages.js').AllPackages;
+
+//
 //  Get the command-line arguments
 //
 var argv = require('yargs')
@@ -47,7 +57,7 @@ var argv = require('yargs')
       describe: 'width of container in pixels'
     },
     packages: {
-      default: 'base, ams, noundefined, newcommand, boldsymbol, braket, mhchem, physics, verb, cancel, enclose',
+      default: AllPackages.sort().join(', '),
       describe: 'the packages to use, e.g. "base, ams"'
     },
     css: {
@@ -55,33 +65,11 @@ var argv = require('yargs')
       describe: 'output the required CSS rather than the HTML itself'
     },
     fontURL: {
-      default: 'https://cdn.rawgit.com/mathjax/mathjax-v3/3.0.0-beta.2/mathjax2/css',
+      default: 'https://cdn.rawgit.com/mathjax/mathjax-v3/3.0.0-beta.3/mathjax2/css',
       describe: 'the URL to use for web fonts'
     }
   })
   .argv;
-
-//
-//  Load the packages needed for MathJax
-//
-const TeX = require('mathjax3/mathjax3/input/tex.js').TeX;
-const CHTML = require('mathjax3/mathjax3/output/chtml.js').CHTML;
-const HTMLMathItem = require('mathjax3/mathjax3/handlers/html/HTMLMathItem.js').HTMLMathItem;
-const HTMLDocument = require('mathjax3/mathjax3/handlers/html/HTMLDocument.js').HTMLDocument;
-const liteAdaptor = require('mathjax3/mathjax3/adaptors/liteAdaptor.js').liteAdaptor;
-const LiteDocument = require('mathjax3/mathjax3/adaptors/lite/Document.js').LiteDocument;
-
-require('mathjax3/mathjax3/input/tex/base/BaseConfiguration.js');
-require('mathjax3/mathjax3/input/tex/ams/AmsConfiguration.js');
-require('mathjax3/mathjax3/input/tex/noundefined/NoUndefinedConfiguration.js');
-require('mathjax3/mathjax3/input/tex/newcommand/NewcommandConfiguration.js');
-require('mathjax3/mathjax3/input/tex/boldsymbol/BoldsymbolConfiguration.js');
-require('mathjax3/mathjax3/input/tex/braket/BraketConfiguration.js');
-require('mathjax3/mathjax3/input/tex/mhchem/MhchemConfiguration.js');
-require('mathjax3/mathjax3/input/tex/physics/PhysicsConfiguration.js');
-require('mathjax3/mathjax3/input/tex/verb/VerbConfiguration.js');
-require('mathjax3/mathjax3/input/tex/cancel/CancelConfiguration.js');
-require('mathjax3/mathjax3/input/tex/enclose/EncloseConfiguration.js');
 
 //
 //  Create the input and ouptut jax
@@ -93,15 +81,15 @@ const chtml = new CHTML({fontURL: argv.fontURL});
 //  Create an HTML document using a LiteDocument and the input and output jax
 //
 const adaptor = liteAdaptor();
-const html = new HTMLDocument(new LiteDocument(), adaptor, {InputJax: tex, OutputJax: chtml});
+const html = new HTMLDocument('', adaptor, {InputJax: tex, OutputJax: chtml});
 
 //
 //  Typeset a TeX string and return the serialized HTML
 //
 const Typeset = (string, display, em = 16, ex = 8, cwidth = 80*16) => {
-    const math = new HTMLMathItem(string, tex, display);
+    const math = new html.options.MathItem(string, tex, display);
     math.setMetrics(em, ex, cwidth, 100000, 1);
-    math.compile();
+    math.compile(html);
     math.typeset(html)
     return adaptor.outerHTML(math.typesetRoot);
 };

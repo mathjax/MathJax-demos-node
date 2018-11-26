@@ -24,6 +24,15 @@
  */
 
 //
+//  Load the packages needed for MathJax
+//
+const MathJax = require('mathjax3/mathjax3/mathjax.js').MathJax;
+const TeX = require('mathjax3/mathjax3/input/tex.js').TeX;
+const SVG = require('mathjax3/mathjax3/output/svg.js').SVG;
+
+const AllPackages = require('mathjax3/mathjax3/input/tex/AllPackages.js').AllPackages;
+
+//
 //  Get the command-line arguments
 //
 var argv = require('yargs')
@@ -39,32 +48,13 @@ var argv = require('yargs')
       describe: 'ex-size in pixels'
     },
     packages: {
-      default: 'base, ams, noundefined, newcommand, boldsymbol, bracket, mhchem, physics, verb, cancel, enclose',
+      default: AllPackages.sort().join(', '),
       describe: 'the packages to use, e.g. "base, ams"'
     }
   })
   .argv;
 
 const fs = require('fs');
-
-//
-//  Load the packages needed for MathJax
-//
-const MathJax = require('mathjax3/mathjax3/mathjax.js').MathJax;
-const TeX = require('mathjax3/mathjax3/input/tex.js').TeX;
-const SVG = require('mathjax3/mathjax3/output/svg.js').SVG;
-
-require('mathjax3/mathjax3/input/tex/base/BaseConfiguration.js');
-require('mathjax3/mathjax3/input/tex/ams/AmsConfiguration.js');
-require('mathjax3/mathjax3/input/tex/noundefined/NoUndefinedConfiguration.js');
-require('mathjax3/mathjax3/input/tex/newcommand/NewcommandConfiguration.js');
-require('mathjax3/mathjax3/input/tex/boldsymbol/BoldsymbolConfiguration.js');
-require('mathjax3/mathjax3/input/tex/braket/BraketConfiguration.js');
-require('mathjax3/mathjax3/input/tex/mhchem/MhchemConfiguration.js');
-require('mathjax3/mathjax3/input/tex/physics/PhysicsConfiguration.js');
-require('mathjax3/mathjax3/input/tex/verb/VerbConfiguration.js');
-require('mathjax3/mathjax3/input/tex/cancel/CancelConfiguration.js');
-require('mathjax3/mathjax3/input/tex/enclose/EncloseConfiguration.js');
 
 //
 //  Create DOM adaptor and register it for HTML documents

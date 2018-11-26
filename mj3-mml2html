@@ -47,7 +47,7 @@ var argv = require('yargs')
       describe: 'output the required CSS rather than the HTML itself'
     },
     fontURL: {
-      default: 'https://cdn.rawgit.com/mathjax/mathjax-v3/3.0.0-beta.2/mathjax2/css',
+      default: 'https://cdn.rawgit.com/mathjax/mathjax-v3/3.0.0-beta.3/mathjax2/css',
       describe: 'the URL to use for web fonts'
     }
   })
@@ -58,10 +58,8 @@ var argv = require('yargs')
 //
 const MathML = require('mathjax3/mathjax3/input/mathml.js').MathML;
 const CHTML = require('mathjax3/mathjax3/output/chtml.js').CHTML;
-const HTMLMathItem = require('mathjax3/mathjax3/handlers/html/HTMLMathItem.js').HTMLMathItem;
 const HTMLDocument = require('mathjax3/mathjax3/handlers/html/HTMLDocument.js').HTMLDocument;
 const liteAdaptor = require('mathjax3/mathjax3/adaptors/liteAdaptor.js').liteAdaptor;
-const LiteDocument = require('mathjax3/mathjax3/adaptors/lite/Document.js').LiteDocument;
 
 //
 //  Create the input and ouptut jax
@@ -73,15 +71,15 @@ const chtml = new CHTML({fontURL: argv.fontURL});
 //  Create an HTML document using a LiteDocument and the input and output jax
 //
 const adaptor = liteAdaptor();
-const html = new HTMLDocument(new LiteDocument(), adaptor, {InputJax: mml, OutputJax: chtml});
+const html = new HTMLDocument('', adaptor, {InputJax: mml, OutputJax: chtml});
 
 //
 //  Typeset a MathML string and return the serialized HTML
 //
 const Typeset = (string, em = 16, ex = 8, cwidth = 80*16) => {
-    const math = new HTMLMathItem(string, mml);
+    const math = new html.options.MathItem(string, mml);
     math.setMetrics(em, ex, cwidth, 100000, 1);
-    math.compile();
+    math.compile(html);
     math.typeset(html)
     return adaptor.outerHTML(math.typesetRoot);
 };
