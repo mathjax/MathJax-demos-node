@@ -4,7 +4,7 @@
  *
  *  component/mml2svg-page
  *
- *  Uses MathJax v3 to convert all MathML in an SVG document.
+ *  Uses MathJax v3 to convert all MathML in an HTML document.
  *
  * ----------------------------------------------------------------------
  *
@@ -70,6 +70,9 @@ MathJax = {
     svg: {
         fontCache: argv.fontCache,
         exFactor: argv.ex / argv.em
+    },
+    'adaptors/liteDOM': {
+        fontSize: argv.em
     },
     startup: {
         document: htmlfile,

@@ -71,6 +71,9 @@ MathJax = {
         fontURL: argv.fontURL,
         exFactor: argv.ex / argv.em
     },
+    'adaptors/liteDOM': {
+        fontSize: argv.em
+    },
     startup: {
         document: htmlfile,
         ready: () => {

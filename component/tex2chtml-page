@@ -76,10 +76,15 @@ MathJax = {
         require: require,
         load: ['input/tex-full', 'output/chtml', 'adaptors/liteDOM']
     },
-    tex: {packages: argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/)},
+    tex: {
+        packages: argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/)
+    },
     chtml: {
         fontURL: argv.fontURL,
         exFactor: argv.ex / argv.em
+    },
+    'adaptors/liteDOM': {
+        fontSize: argv.em
     },
     startup: {
         document: htmlfile,

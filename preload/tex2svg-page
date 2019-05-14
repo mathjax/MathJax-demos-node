@@ -73,6 +73,9 @@ MathJax = {
         fontCache: argv.fontCache,
         exFactor: argv.ex / argv.em
     },
+    'adaptors/liteDOM': {
+        fontSize: argv.em
+    },
     startup: {
         document: htmlfile,
         typeset: false
