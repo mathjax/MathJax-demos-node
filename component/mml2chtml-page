@@ -1,0 +1,90 @@
+#! /usr/bin/env node -r esm
+
+/*************************************************************************
+ *
+ *  component/mml2chtml-page
+ *
+ *  Uses MathJax v3 to convert all MathML in an HTML document.
+ *
+ * ----------------------------------------------------------------------
+ *
+ *  Copyright (c) 2019 The MathJax Consortium
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+const fs = require('fs');
+
+//
+//  Get the command-line arguments
+//
+var argv = require('yargs')
+    .demand(0).strict()
+    .usage('$0 [options] file.html > converted.html')
+    .options({
+        em: {
+            default: 16,
+            describe: 'em-size in pixels'
+        },
+        ex: {
+            default: 8,
+            describe: 'ex-size in pixels'
+        },
+        fontURL: {
+            default: 'https://cdn.rawgit.com/mathjax/mathjax-v3/3.0.0-beta.4/mathjax2/css/woff',
+            describe: 'the URL to use for web fonts'
+        },
+        dist: {
+            boolean: true,
+            default: false,
+            describe: 'true to use webpacked version, false to use mathjax3 source files'
+        }
+    })
+    .argv;
+
+//
+//  Read the HTML file
+//
+const htmlfile = fs.readFileSync(argv._[0], 'utf8');
+
+//
+// Configure MathJax
+//
+MathJax = {
+    loader: {
+        paths: {mathjax: 'mathjax3/components/dist'},
+        source: (argv.dist ? {} : require('mathjax3/components/src/source.js').source),
+        require: require,
+        load: ['input/mml', 'output/chtml', 'adaptors/liteDOM']
+    },
+    chtml: {
+        fontURL: argv.fontURL,
+        exFactor: argv.ex / argv.em
+    },
+    startup: {
+        document: htmlfile,
+        ready: () => {
+            MathJax.startup.defaultReady();
+            const adaptor = MathJax.startup.adaptor;
+            const html = MathJax.startup.document;
+            MathJax.startup.promise.then(() => {
+                console.log(adaptor.outerHTML(adaptor.root(html.document)));
+            }).catch(err => console.log(err));
+        }
+    }
+}
+
+//
+//  Load the MathJax startup module
+//
+require('mathjax3/components/' + (argv.dist ? 'dist' : 'src/startup') + '/startup.js');
