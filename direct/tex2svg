@@ -26,10 +26,11 @@
 //
 //  Load the packages needed for MathJax
 //
+const MathJax = require('mathjax3/mathjax3/mathjax.js').MathJax;
 const TeX = require('mathjax3/mathjax3/input/tex.js').TeX;
 const SVG = require('mathjax3/mathjax3/output/svg.js').SVG;
-const HTMLDocument = require('mathjax3/mathjax3/handlers/html/HTMLDocument.js').HTMLDocument;
 const liteAdaptor = require('mathjax3/mathjax3/adaptors/liteAdaptor.js').liteAdaptor;
+const RegisterHTMLHandler = require('mathjax3/mathjax3/handlers/html.js').RegisterHTMLHandler;
 
 const AllPackages = require('mathjax3/mathjax3/input/tex/AllPackages.js').AllPackages;
 
@@ -73,16 +74,17 @@ var argv = require('yargs')
     .argv;
 
 //
-//  Create the input and ouptut jax
+//  Create DOM adaptor and register it for HTML documents
+//
+const adaptor = liteAdaptor();
+RegisterHTMLHandler(adaptor);
+
+//
+//  Create input and output jax and a document using them on the content from the HTML file
 //
 const tex = new TeX({packages: argv.packages.split(/\s*,\s*/)});
 const svg = new SVG({fontCache: (argv.fontCache ? 'local' : 'none')});
-
-//
-//  Create an HTML document using a LiteDocument and the input and output jax
-//
-const adaptor = liteAdaptor();
-const html = new HTMLDocument('', adaptor, {InputJax: tex, OutputJax: svg});
+const html = MathJax.document('', {InputJax: tex, OutputJax: svg});
 
 //
 //  Typeset the math from the command line
