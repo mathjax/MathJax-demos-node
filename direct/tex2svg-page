@@ -60,12 +60,10 @@ var argv = require('yargs')
     })
     .argv;
 
-const fs = require('fs');
-
 //
 //  Read the HTML file
 //
-const htmlfile = fs.readFileSync(argv._[0], 'utf8');
+const htmlfile = require('fs').readFileSync(argv._[0], 'utf8');
 
 //
 //  Create DOM adaptor and register it for HTML documents

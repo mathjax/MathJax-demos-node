@@ -54,12 +54,10 @@ var argv = require('yargs')
     })
     .argv;
 
-const fs = require('fs');
-
 //
 //  Read the HTML file
 //
-const htmlfile = fs.readFileSync(argv._[0], 'utf8');
+const htmlfile = require('fs').readFileSync(argv._[0], 'utf8');
 
 //
 // Configure MathJax
@@ -88,9 +86,9 @@ MathJax = {
             MathJax.startup.defaultReady();
             const adaptor = MathJax.startup.adaptor;
             const html = MathJax.startup.document;
-            MathJax.startup.promise.then(() => {
-                console.log(adaptor.outerHTML(adaptor.root(html.document)));
-            }).catch(err => console.log(err));
+            MathJax.startup.promise
+                .then(() => console.log(adaptor.outerHTML(adaptor.root(html.document))))
+                .catch(err => console.log(err));
         }
     }
 }
