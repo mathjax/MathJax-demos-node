@@ -1,8 +1,8 @@
-#! /usr/bin/env node
+#! /usr/bin/env node -r esm
 
 /*************************************************************************
  *
- *  mj3-tex2html-page
+ *  direct/tex2svg-page
  *
  *  Uses MathJax v3 to convert all TeX in an HTML document.
  *
@@ -36,23 +36,27 @@ const AllPackages = require('mathjax3/mathjax3/input/tex/AllPackages.js').AllPac
 //  Get the command-line arguments
 //
 var argv = require('yargs')
-  .demand(1).strict()
-  .usage('$0 [options] file.html > converted.html')
-  .options({
-    em: {
-      default: 16,
-      describe: 'em-size in pixels'
-    },
-    ex: {
-      default: 8,
-      describe: 'ex-size in pixels'
-    },
-    packages: {
-      default: AllPackages.sort().join(', '),
-      describe: 'the packages to use, e.g. "base, ams"'
-    }
-  })
-  .argv;
+    .demand(1).strict()
+    .usage('$0 [options] file.html > converted.html')
+    .options({
+        em: {
+            default: 16,
+            describe: 'em-size in pixels'
+        },
+        ex: {
+            default: 8,
+            describe: 'ex-size in pixels'
+        },
+        packages: {
+            default: AllPackages.sort().join(', '),
+            describe: 'the packages to use, e.g. "base, ams"'
+        },
+        fontCache: {
+            default: 'global',
+            describe: 'cache type: local, global, none'
+        }
+    })
+    .argv;
 
 const fs = require('fs');
 
@@ -71,19 +75,15 @@ const htmlfile = fs.readFileSync(argv._[0], 'utf8');
 //  Create input and output jax and a document using them on the content from the HTML file
 //
 const tex = new TeX({packages: argv.packages.split(/\s*,\s*/)});
-const svg = new SVG({exFactor: argv.ex / argv.em});
+const svg = new SVG({fontCache: argv.fontCache, exFactor: argv.ex / argv.em});
 const html = MathJax.document(htmlfile, {InputJax: tex, OutputJax: svg});
 
 //
 //  Typeset the document
 //
-html.findMath()
-    .compile()
-    .getMetrics()
-    .typeset()
-    .updateDocument();
+html.render();
 
 //
 //  Output the resulting HTML
 //
-console.log(adaptor.outerHTML(adaptor.parent(adaptor.body(html.document))));
+console.log(adaptor.outerHTML(adaptor.root(html.document)));

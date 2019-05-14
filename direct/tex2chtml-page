@@ -1,8 +1,8 @@
-#! /usr/bin/env node
+#! /usr/bin/env node -r esm
 
 /*************************************************************************
  *
- *  mj3-tex2html-page
+ *  direct/tex2chtml-page
  *
  *  Uses MathJax v3 to convert all TeX in an HTML document.
  *
@@ -36,27 +36,27 @@ const AllPackages = require('mathjax3/mathjax3/input/tex/AllPackages.js').AllPac
 //  Get the command-line arguments
 //
 var argv = require('yargs')
-  .demand(1).strict()
-  .usage('$0 [options] file.html > converted.html')
-  .options({
-    em: {
-      default: 16,
-      describe: 'em-size in pixels'
-    },
-    ex: {
-      default: 8,
-      describe: 'ex-size in pixels'
-    },
-    packages: {
-      default: AllPackages.sort().join(', '),
-      describe: 'the packages to use, e.g. "base, ams"'
-    },
-    fontURL: {
-      default: 'https://cdn.rawgit.com/mathjax/mathjax-v3/3.0.0-beta.3/mathjax2/css',
-      describe: 'the URL to use for web fonts'
-    }
-  })
-  .argv;
+    .demand(1).strict()
+    .usage('$0 [options] file.html > converted.html')
+    .options({
+        em: {
+            default: 16,
+            describe: 'em-size in pixels'
+        },
+        ex: {
+            default: 8,
+            describe: 'ex-size in pixels'
+        },
+        packages: {
+            default: AllPackages.sort().join(', '),
+            describe: 'the packages to use, e.g. "base, ams"'
+        },
+        fontURL: {
+            default: 'https://cdn.rawgit.com/mathjax/mathjax-v3/3.0.0-beta.3/mathjax2/css/woff',
+            describe: 'the URL to use for web fonts'
+        }
+    })
+    .argv;
 
 const fs = require('fs');
 
@@ -81,13 +81,9 @@ const html = MathJax.document(htmlfile, {InputJax: tex, OutputJax: chtml});
 //
 //  Typeset the document
 //
-html.findMath()
-    .compile()
-    .getMetrics()
-    .typeset()
-    .updateDocument();
+html.render();
 
 //
 //  Output the resulting HTML
 //
-console.log(adaptor.outerHTML(adaptor.parent(adaptor.body(html.document))));
+console.log(adaptor.outerHTML(adaptor.root(html.document)));

@@ -1,10 +1,10 @@
-#! /usr/bin/env node
+#! /usr/bin/env node -r esm
 
 /*************************************************************************
  *
- *  mj3-tex2html
+ *  direct/tex2svg
  *
- *  Uses MathJax v3 to convert a TeX string to an HTML string.
+ *  Uses MathJax v3 to convert a TeX string to an SVG string.
  *
  * ----------------------------------------------------------------------
  *
@@ -27,7 +27,7 @@
 //  Load the packages needed for MathJax
 //
 const TeX = require('mathjax3/mathjax3/input/tex.js').TeX;
-const CHTML = require('mathjax3/mathjax3/output/chtml.js').CHTML;
+const SVG = require('mathjax3/mathjax3/output/svg.js').SVG;
 const HTMLDocument = require('mathjax3/mathjax3/handlers/html/HTMLDocument.js').HTMLDocument;
 const liteAdaptor = require('mathjax3/mathjax3/adaptors/liteAdaptor.js').liteAdaptor;
 
@@ -37,69 +37,69 @@ const AllPackages = require('mathjax3/mathjax3/input/tex/AllPackages.js').AllPac
 //  Get the command-line arguments
 //
 var argv = require('yargs')
-  .demand(0).strict()
-  .usage('$0 [options] "math" > file.html')
-  .options({
-    inline: {
-      boolean: true,
-      describe: "process as display math"
-    },
-    em: {
-      default: 16,
-      describe: 'em-size in pixels'
-    },
-    ex: {
-      default: 8,
-      describe: 'ex-size in pixels'
-    },
-    width: {
-      default: 80 * 16,
-      describe: 'width of container in pixels'
-    },
-    packages: {
-      default: AllPackages.sort().join(', '),
-      describe: 'the packages to use, e.g. "base, ams"'
-    },
-    css: {
-      boolean: true,
-      describe: 'output the required CSS rather than the HTML itself'
-    },
-    fontURL: {
-      default: 'https://cdn.rawgit.com/mathjax/mathjax-v3/3.0.0-beta.3/mathjax2/css',
-      describe: 'the URL to use for web fonts'
-    }
-  })
-  .argv;
+    .demand(0).strict()
+    .usage('$0 [options] "math" > file.svg')
+    .options({
+        inline: {
+            boolean: true,
+            describe: "process as inline math"
+        },
+        em: {
+            default: 16,
+            describe: 'em-size in pixels'
+        },
+        ex: {
+            default: 8,
+            describe: 'ex-size in pixels'
+        },
+        width: {
+            default: 80 * 16,
+            describe: 'width of container in pixels'
+        },
+        packages: {
+            default: AllPackages.sort().join(', '),
+            describe: 'the packages to use, e.g. "base, ams"'
+        },
+        css: {
+            boolean: true,
+            describe: 'output the required CSS rather than the SVG itself'
+        },
+        fontCache: {
+            boolean: true,
+            default: true,
+            describe: 'whether to use a local font cache or not'
+        }
+    })
+    .argv;
 
 //
 //  Create the input and ouptut jax
 //
 const tex = new TeX({packages: argv.packages.split(/\s*,\s*/)});
-const chtml = new CHTML({fontURL: argv.fontURL});
+const svg = new SVG({fontCache: (argv.fontCache ? 'local' : 'none')});
 
 //
 //  Create an HTML document using a LiteDocument and the input and output jax
 //
 const adaptor = liteAdaptor();
-const html = new HTMLDocument('', adaptor, {InputJax: tex, OutputJax: chtml});
+const html = new HTMLDocument('', adaptor, {InputJax: tex, OutputJax: svg});
 
 //
-//  Typeset a TeX string and return the serialized HTML
+//  Typeset the math from the command line
 //
-const Typeset = (string, display, em = 16, ex = 8, cwidth = 80*16) => {
-    const math = new html.options.MathItem(string, tex, display);
-    math.setMetrics(em, ex, cwidth, 100000, 1);
-    math.compile(html);
-    math.typeset(html)
-    return adaptor.outerHTML(math.typesetRoot);
-};
+const node = html.convert(argv._[0] || '', {
+    display: !argv.inline,
+    em: argv.em,
+    ex: argv.ex,
+    cwidth: argv.width
+});
 
 //
 //  If the --css option was specified, output the CSS,
 //  Otherwise, typeset the math and output the HTML
 //
 if (argv.css) {
-  console.log(adaptor.textContent(chtml.styleSheet(html)));
+    console.log(adaptor.textContent(svg.styleSheet(html)));
 } else {
-  console.log(Typeset(argv._[0] || '', !argv.inline, argv.em, argv.ex, argv.width));
+    console.log(adaptor.outerHTML(node));
 }

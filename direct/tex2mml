@@ -1,8 +1,8 @@
-#! /usr/bin/env node
+#! /usr/bin/env node -r esm
 
 /*************************************************************************
  *
- *  mj3-tex2mml
+ *  direct/tex2mml
  *
  *  Uses MathJax v3 to convert a TeX string to a MathML string.
  *
@@ -29,6 +29,7 @@
 const TeX = require('mathjax3/mathjax3/input/tex.js').TeX;
 const HTMLDocument = require('mathjax3/mathjax3/handlers/html/HTMLDocument.js').HTMLDocument;
 const liteAdaptor = require('mathjax3/mathjax3/adaptors/liteAdaptor.js').liteAdaptor;
+const STATE = require('mathjax3/mathjax3/core/MathItem.js').STATE;
 
 const AllPackages = require('mathjax3/mathjax3/input/tex/AllPackages.js').AllPackages;
 
@@ -36,19 +37,19 @@ const AllPackages = require('mathjax3/mathjax3/input/tex/AllPackages.js').AllPac
 //  Get the command-line arguments
 //
 var argv = require('yargs')
-  .demand(0).strict()
-  .usage('$0 [options] "math" > file.html')
-  .options({
-    inline: {
-      boolean: true,
-      describe: "process as display math"
-    },
-    packages: {
-      default: AllPackages.sort().join(', '),
-      describe: 'the packages to use, e.g. "base, ams"'
-    }
-  })
-  .argv;
+    .demand(0).strict()
+    .usage('$0 [options] "math" > file.html')
+    .options({
+        inline: {
+            boolean: true,
+            describe: "process as inline math"
+        },
+        packages: {
+            default: AllPackages.sort().join(', '),
+            describe: 'the packages to use, e.g. "base, ams"'
+        }
+    })
+    .argv;
 
 //
 //  Create the input jax
@@ -68,16 +69,6 @@ const visitor = new MmlVisitor();
 const toMathML = (node => visitor.visitTree(node, html));
 
 //
-//  Typeset a TeX string and return the serialized MathML
+//  Convert the math from the command line to serialzied MathML
 //
-const Typeset = (string, display) => {
-    const math = new html.options.MathItem(string, tex, display);
-    math.compile(html);
-    return toMathML(math.root);
-};
-
-//
-//  Convert the math provided by the user
-//
-console.log(Typeset(argv._[0] || '', !argv.inline));
-
+console.log(toMathML(html.convert(argv._[0] || '', {display: !argv.inline, end: STATE.CONVERT})));

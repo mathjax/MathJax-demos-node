@@ -2,7 +2,7 @@
 
 /*************************************************************************
  *
- *  mj3-mml2html
+ *  direct/mml2chtml
  *
  *  Uses MathJax v3 to convert a MathML string to an HTML string.
  *
@@ -27,31 +27,31 @@
 //  Get the command-line arguments
 //
 var argv = require('yargs')
-  .demand(0).strict()
-  .usage('$0 [options] "math" > file.html')
-  .options({
-    em: {
-      default: 16,
-      describe: 'em-size in pixels'
-    },
-    ex: {
-      default: 8,
-      describe: 'ex-size in pixels'
-    },
-    width: {
-      default: 80 * 16,
-      describe: 'width of container in pixels'
-    },
-    css: {
-      boolean: true,
-      describe: 'output the required CSS rather than the HTML itself'
-    },
-    fontURL: {
-      default: 'https://cdn.rawgit.com/mathjax/mathjax-v3/3.0.0-beta.3/mathjax2/css',
-      describe: 'the URL to use for web fonts'
-    }
-  })
-  .argv;
+    .demand(0).strict()
+    .usage('$0 [options] "math" > file.html')
+    .options({
+        em: {
+            default: 16,
+            describe: 'em-size in pixels'
+        },
+        ex: {
+            default: 8,
+            describe: 'ex-size in pixels'
+        },
+        width: {
+            default: 80 * 16,
+            describe: 'width of container in pixels'
+        },
+        css: {
+            boolean: true,
+            describe: 'output the required CSS rather than the HTML itself'
+        },
+        fontURL: {
+            default: 'https://cdn.rawgit.com/mathjax/mathjax-v3/3.0.0-beta.3/mathjax2/css/woff',
+            describe: 'the URL to use for web fonts'
+        }
+    })
+    .argv;
 
 //
 //  Load the packages needed for MathJax
@@ -74,22 +74,21 @@ const adaptor = liteAdaptor();
 const html = new HTMLDocument('', adaptor, {InputJax: mml, OutputJax: chtml});
 
 //
-//  Typeset a MathML string and return the serialized HTML
+//  Typeset the math from the command line
 //
-const Typeset = (string, em = 16, ex = 8, cwidth = 80*16) => {
-    const math = new html.options.MathItem(string, mml);
-    math.setMetrics(em, ex, cwidth, 100000, 1);
-    math.compile(html);
-    math.typeset(html)
-    return adaptor.outerHTML(math.typesetRoot);
-};
+const node = html.convert(argv._[0] || '', {
+    display: !argv.inline,
+    em: argv.em,
+    ex: argv.ex,
+    cwidth: argv.width
+});
 
 //
 //  If the --css option was specified, output the CSS,
 //  Otherwise, typeset the math and output the HTML
 //
 if (argv.css) {
-  console.log(adaptor.textContent(chtml.styleSheet(html)));
+    console.log(adaptor.textContent(chtml.styleSheet(html)));
 } else {
-  console.log(Typeset(argv._[0] || '', argv.em, argv.ex, argv.width));
+    console.log(adaptor.outerHTML(node));
 }
