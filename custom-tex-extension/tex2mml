@@ -77,16 +77,14 @@ MathJax = {
     },
     tex: {packages: argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/)},
     startup: {
-        typeset: false,
         ready: () => {
             MathJax.startup.defaultReady();
-            const adaptor = MathJax.startup.adaptor;
             MathJax.tex2mmlPromise(argv._[0] || '', {display: !argv.inline})
                 .then(mml => console.log(mml))
                 .catch(err => console.log(err));
         }
     }
-}
+};
 
 //
 //  Load the MathJax startup module

@@ -89,13 +89,13 @@ MathJax = {
         typeset: false,
         ready: () => {
             MathJax.startup.defaultReady();
-            const adaptor = MathJax.startup.adaptor;
             MathJax.tex2svgPromise(argv._[0] || '', {
                 display: !argv.inline,
                 em: argv.em,
                 ex: argv.ex,
                 cwidth: argv.width
             }).then((node) => {
+                const adaptor = MathJax.startup.adaptor;
                 //
                 //  If the --css option was specified, output the CSS,
                 //  Otherwise, output the typeset math as SVG

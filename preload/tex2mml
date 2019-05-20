@@ -76,8 +76,6 @@ require('mathjax3/components/src/core/core.js');
 require('mathjax3/components/src/adaptors/liteDOM/liteDOM.js');
 require('mathjax3/components/src/input/tex-base/tex-base.js');
 require('mathjax3/components/src/input/tex/extensions/all-packages/all-packages.js');
-require('mathjax3/components/src/input/tex/extensions/autoload/autoload.js');
-require('mathjax3/components/src/input/tex/extensions/require/require.js');
 require('mathjax3/components/src/startup/startup.js');
 
 //
@@ -87,9 +85,7 @@ MathJax.loader.preLoad(
     'core',
     'adaptors/liteDOM',
     'input/tex-base',
-    '[tex]/all-packages',
-    '[tex]/autoload',
-    '[tex]/require'
+    '[tex]/all-packages'
 );
 
 //
