@@ -1,4 +1,4 @@
-# [mj3-demos](https://github.com/mathjax/mj3-demos)
+# [mj3-demos-node](https://github.com/mathjax/mj3-demos-node)
 
 A repository with examples using [mathjax-v3](https://github.com/mathjax/mathjax-v3).
 
@@ -38,11 +38,11 @@ The first four convert an expression from a TeX or MathML string (its first argu
 
 Use the `--help` option to get a list of all the possible options for each command.
 
-The three categories of commands are stored in the directories called [component](component/README.md), [preload](preload/README.md), and [direct](direct/README.md).  See those directories for additional information about the example files they contain.
+The three categories of commands are stored in the directories called [component](component), [preload](preload), and [direct](direct).  See those directories for additional information about the example files they contain.
 
-There are also a directory [speech](speech/README.md) that give examples of converters that add speech strings to their results, which illustrate more sophisticated operations in MathJax.  This is described in more detail in that directory.
+There are also a directory [speech](speech) that give examples of converters that add speech strings to their results, which illustrate more sophisticated operations in MathJax.  This is described in more detail in that directory.
 
-Finally, the [custom-tex-extension](custom-tex-extension/README.md) directory contains an example of how to create your own custom TeX extension and load it as a component.  Again, see the directory for more details.
+Finally, the [custom-tex-extension](custom-tex-extension) directory contains an example of how to create your own custom TeX extension and load it as a component.  Again, see the directory for more details.
 
 ## Installation
 

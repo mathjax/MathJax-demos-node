@@ -8,7 +8,7 @@ The main steps needed for this are to:
 2. Configure extension to generate deep or shallow speech strings, and
 3. Add a custom `renderAction` to the math document that removes all non-speech attributes added by the enrichment process.
 
-Most of the examples in this directory use the MathJax [components approach](../component/README.md) to accomplish this, but the `mml2svg` example uses the [direct approach](../direct/README.md) in order to illustrate that as well.
+Most of the examples in this directory use the MathJax [components approach](../component) to accomplish this, but the `mml2svg` example uses the [direct approach](../direct) in order to illustrate that as well.
 
 ## Component-Base Example
 
@@ -35,7 +35,7 @@ The rest of the file is the same as the standard `tex2chtml` using components.  
 
 ## Direct-Import Example
 
-The [`mml2svg`](mml2svg) example uses the [direct import](../direct/README.md) approach.  The key additions in this case are
+The [`mml2svg`](mml2svg) example uses the [direct import](../direct) approach.  The key additions in this case are
 
 ```
 const EnrichHandler = require('mathjax3/mathjax3/a11y/semantic-enrich.js').EnrichHandler;

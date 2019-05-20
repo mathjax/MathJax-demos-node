@@ -1,6 +1,6 @@
 # Component-Based Examples
 
-The examples in this directory illustrate how to use MathJax v3 components in your NodeJS projects.  Loading of components in asynchronous, and so you may need to use promises to mediate the flow of your program, particular program startup.  Once MathJax's components are loaded, however, you can call the non-promise-based functions, but should use the promise-based ones if you want to support autoloading of extensions or the `\require` macro in TeX input.  (Note that the [preload](../preload/README.md) examples show how to operate synchronously from the outset, if that is required.)
+The examples in this directory illustrate how to use MathJax v3 components in your NodeJS projects.  Loading of components in asynchronous, and so you may need to use promises to mediate the flow of your program, particular program startup.  Once MathJax's components are loaded, however, you can call the non-promise-based functions, but should use the promise-based ones if you want to support autoloading of extensions or the `\require` macro in TeX input.  (Note that the [preload](../preload) examples show how to operate synchronously from the outset, if that is required.)
 
 All the examples in this directory consist of three main parts:
 
