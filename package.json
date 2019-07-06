@@ -6,12 +6,13 @@
     "make-components": "cd node_modules/mathjax3/components && bin/makeAll src"
   },
   "dependencies": {
-    "mathjax3": "^3.0.0-beta.4",
     "esm": "^3.0.34",
+    "mathjax3": "^3.0.0-beta.4",
     "yargs": "^11.0.0"
   },
   "devDependencies": {
     "ajv": "^6.4.0",
+    "mem": "^4.0.0",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.4",
     "babel-preset-env": "^1.6.1",
