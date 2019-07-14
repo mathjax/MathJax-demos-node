@@ -13,6 +13,7 @@
   "devDependencies": {
     "ajv": "^6.4.0",
     "mem": "^4.0.0",
+    "lodash": "^4.17.14",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.4",
     "babel-preset-env": "^1.6.1",
