@@ -59,7 +59,7 @@ var argv = require('yargs')
         dist: {
             boolean: true,
             default: false,
-            describe: 'true to use webpacked version, false to use mathjax3 source files'
+            describe: 'true to use webpacked version, false to use MathJax source files'
         }
     })
     .argv;
@@ -69,21 +69,20 @@ var argv = require('yargs')
 //
 MathJax = {
     loader: {
-        paths: {mathjax: 'mathjax3/components/dist'},
-        source: (argv.dist ? {} : require('mathjax3/components/src/source.js').source),
+        paths: {mathjax: 'mathjax-full/es5'},
+        source: (argv.dist ? {} : require('mathjax-full/components/src/source.js').source),
         require: require,
         load: ['adaptors/liteDOM']
     },
     svg: {fontCache: (argv.fontCache ? 'local' : 'none')},
     startup: {
         typeset: false,
-        ready: () => {
-            MathJax.startup.defaultReady();
+        pageReady: () => {
             MathJax.mathml2svgPromise(argv._[0] || '', {
                 display: !argv.inline,
                 em: argv.em,
                 ex: argv.ex,
-                cwidth: argv.width
+                containerWidth: argv.width
             }).then((node) => {
                 const adaptor = MathJax.startup.adaptor;
                 //
@@ -103,5 +102,5 @@ MathJax = {
 //
 //  Load the MathJax startup module
 //
-require('mathjax3/components/' + (argv.dist ? 'dist' : 'src/mml-svg') + '/mml-svg.js');
+require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/mml-svg') + '/mml-svg.js');
 

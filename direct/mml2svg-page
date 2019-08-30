@@ -26,11 +26,11 @@
 //
 //  Load the packages needed for MathJax
 //
-const MathJax = require('mathjax3/mathjax3/mathjax.js').MathJax;
-const MathML = require('mathjax3/mathjax3/input/mathml.js').MathML;
-const SVG = require('mathjax3/mathjax3/output/svg.js').SVG;
-const liteAdaptor = require('mathjax3/mathjax3/adaptors/liteAdaptor.js').liteAdaptor;
-const RegisterHTMLHandler = require('mathjax3/mathjax3/handlers/html.js').RegisterHTMLHandler;
+const mathjax = require('mathjax-full/js/mathjax.js').mathjax;
+const MathML = require('mathjax-full/js/input/mathml.js').MathML;
+const SVG = require('mathjax-full/js/output/svg.js').SVG;
+const liteAdaptor = require('mathjax-full/js/adaptors/liteAdaptor.js').liteAdaptor;
+const RegisterHTMLHandler = require('mathjax-full/js/handlers/html.js').RegisterHTMLHandler;
 
 //
 //  Get the command-line arguments
@@ -70,7 +70,7 @@ RegisterHTMLHandler(adaptor);
 //
 const mathml = new MathML();
 const svg = new SVG({fontCache: argv.fontCache, exFactor: argv.ex / argv.em});
-const html = MathJax.document(htmlfile, {InputJax: mathml, OutputJax: svg});
+const html = mathjax.document(htmlfile, {InputJax: mathml, OutputJax: svg});
 
 //
 //  Typeset the document

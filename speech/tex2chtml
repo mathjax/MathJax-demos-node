@@ -81,8 +81,8 @@ var argv = require('yargs')
 //
 MathJax = {
     loader: {
-        paths: {mathjax: 'mathjax3/components/dist', sre: 'mathjax3/mathjax3/a11y/sre-node'},
-        source: (argv.dist ? {} : require('mathjax3/components/src/source.js').source),
+        paths: {mathjax: 'mathjax-full/es5', sre: 'mathjax-full/js/a11y/sre-node'},
+        source: (argv.dist ? {} : require('mathjax-full/components/src/source.js').source),
         require: require,
         load: ['adaptors/liteDOM', 'a11y/semantic-enrich']
     },
@@ -94,13 +94,12 @@ MathJax = {
     },
     startup: {
         typeset: false,
-        ready: () => {
-            MathJax.startup.defaultReady();
+        pageReady: () => {
             MathJax.tex2chtmlPromise(argv._[0] || '', {
                 display: !argv.inline,
                 em: argv.em,
                 ex: argv.ex,
-                cwidth: argv.width
+                containerWidth: argv.width
             }).then(node => {
                 const adaptor = MathJax.startup.adaptor;
                 //
@@ -120,5 +119,5 @@ MathJax = {
 //
 //  Load the MathJax startup module
 //
-require('mathjax3/components/' + (argv.dist ? 'dist' : 'src/tex-chtml') + '/tex-chtml.js');
+require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/tex-chtml') + '/tex-chtml.js');
 

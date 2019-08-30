@@ -2,9 +2,9 @@
 
 /*************************************************************************
  *
- *  direct/tex2svg-page
+ *  direct/am2chtml-page
  *
- *  Uses MathJax v3 to convert all TeX in an HTML document.
+ *  Uses MathJax v3 to convert all AsciiMath in an HTML document.
  *
  * ----------------------------------------------------------------------
  *
@@ -27,12 +27,10 @@
 //  Load the packages needed for MathJax
 //
 const mathjax = require('mathjax-full/js/mathjax.js').mathjax;
-const TeX = require('mathjax-full/js/input/tex.js').TeX;
-const SVG = require('mathjax-full/js/output/svg.js').SVG;
+const AsciiMath = require('mathjax-full/js/input/asciimath.js').AsciiMath;
+const CHTML = require('mathjax-full/js/output/chtml.js').CHTML;
 const liteAdaptor = require('mathjax-full/js/adaptors/liteAdaptor.js').liteAdaptor;
 const RegisterHTMLHandler = require('mathjax-full/js/handlers/html.js').RegisterHTMLHandler;
-
-const AllPackages = require('mathjax-full/js/input/tex/AllPackages.js').AllPackages;
 
 //
 //  Get the command-line arguments
@@ -49,13 +47,9 @@ var argv = require('yargs')
             default: 8,
             describe: 'ex-size in pixels'
         },
-        packages: {
-            default: AllPackages.sort().join(', '),
-            describe: 'the packages to use, e.g. "base, ams"'
-        },
-        fontCache: {
-            default: 'global',
-            describe: 'cache type: local, global, none'
+        fontURL: {
+            default: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.0.0/es5/output/chtml/fonts/woff-v2',
+            describe: 'the URL to use for web fonts'
         }
     })
     .argv;
@@ -74,9 +68,9 @@ RegisterHTMLHandler(adaptor);
 //
 //  Create input and output jax and a document using them on the content from the HTML file
 //
-const tex = new TeX({packages: argv.packages.split(/\s*,\s*/)});
-const svg = new SVG({fontCache: argv.fontCache, exFactor: argv.ex / argv.em});
-const html = mathjax.document(htmlfile, {InputJax: tex, OutputJax: svg});
+const asciimath = new AsciiMath();
+const chtml = new CHTML({fontURL: argv.fontURL, exFactor: argv.ex / argv.em});
+const html = mathjax.document(htmlfile, {InputJax: asciimath, OutputJax: chtml});
 
 //
 //  Typeset the document

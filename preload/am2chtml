@@ -2,9 +2,9 @@
 
 /*************************************************************************
  *
- *  preload/tex2chtml-page
+ *  preload/am2chtml
  *
- *  Uses MathJax v3 to convert all TeX in an HTML document.
+ *  Uses MathJax v3 to convert an AsciiMath string to an HTML string.
  *
  * ----------------------------------------------------------------------
  *
@@ -23,17 +23,13 @@
  *  limitations under the License.
  */
 
-//
-//  The default TeX packages to use
-//
-const PACKAGES = 'base, autoload, require, ams, newcommand';
 
 //
 //  Get the command-line arguments
 //
 var argv = require('yargs')
     .demand(0).strict()
-    .usage('$0 [options] file.html > converted.html')
+    .usage('$0 [options] "math" > file.html')
     .options({
         em: {
             default: 16,
@@ -43,43 +39,32 @@ var argv = require('yargs')
             default: 8,
             describe: 'ex-size in pixels'
         },
-        packages: {
-            default: PACKAGES,
-            describe: 'the packages to use, e.g. "base, ams"; use "*" to represent the default packages, e.g, "*, bbox"'
+        width: {
+            default: 80 * 16,
+            describe: 'width of container in pixels'
+        },
+        css: {
+            boolean: true,
+            describe: 'output the required CSS rather than the HTML itself'
         },
         fontURL: {
             default: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.0.0/es5/output/chtml/fonts/woff-v2',
             describe: 'the URL to use for web fonts'
+        },
+        dist: {
+            boolean: true,
+            default: false,
+            describe: 'true to use webpacked version, false to use MathJax source files'
         }
     })
     .argv;
 
 //
-//  Read the HTML file
-//
-const htmlfile = require('fs').readFileSync(argv._[0], 'utf8');
-
-//
 //  Configure MathJax
 //
 MathJax = {
-    tex: {
-        packages: argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/)
-    },
-    chtml: {
-        fontURL: argv.fontURL,
-        exFactor: argv.ex / argv.em
-    },
-    'adaptors/liteDOM': {
-        fontSize: argv.em
-    },
-    startup: {
-        document: htmlfile,
-        typeset: false
-    },
-    loader: {
-        require: require
-    }
+    chtml: {fontURL: argv.fontURL},
+    startup: {typeset: false}
 };
 
 //
@@ -88,8 +73,7 @@ MathJax = {
 require('mathjax-full/components/src/startup/lib/startup.js');
 require('mathjax-full/components/src/core/core.js');
 require('mathjax-full/components/src/adaptors/liteDOM/liteDOM.js');
-require('mathjax-full/components/src/input/tex-base/tex-base.js');
-require('mathjax-full/components/src/input/tex/extensions/all-packages/all-packages.js');
+require('mathjax-full/components/src/input/asciimath/asciimath.js');
 require('mathjax-full/components/src/output/chtml/chtml.js');
 require('mathjax-full/components/src/output/chtml/fonts/tex/tex.js');
 require('mathjax-full/components/src/startup/startup.js');
@@ -100,8 +84,7 @@ require('mathjax-full/components/src/startup/startup.js');
 MathJax.loader.preLoad(
     'core',
     'adaptors/liteDOM',
-    'input/tex-base',
-    '[tex]/all-packages',
+    'input/asciimath',
     'output/chtml',
     'output/chtml/fonts/tex'
 );
@@ -112,9 +95,22 @@ MathJax.loader.preLoad(
 MathJax.config.startup.ready();
 
 //
-//  Output the typeset page
+//  Typeset the math from the command line
 //
-MathJax.typeset();
 const adaptor = MathJax.startup.adaptor;
-const html = MathJax.startup.document;
-console.log(adaptor.outerHTML(adaptor.root(html.document)));
+const node = MathJax.asciimath2chtml(argv._[0] || '', {
+    display: false,
+    em: argv.em,
+    ex: argv.ex,
+    containerWidth: argv.width
+});
+
+//
+//  If the --css option was specified, output the CSS,
+//  Otherwise, output the typeset math as HTML
+//
+if (argv.css) {
+    console.log(adaptor.textContent(MathJax.chtmlStylesheet()));
+} else {
+    console.log(adaptor.outerHTML(node));
+};

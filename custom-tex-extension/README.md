@@ -24,17 +24,16 @@ Then we configure MathJax to know about the new package:
 MathJax = {
     loader: {
         paths: {
-            mathjax: 'mathjax3/components/dist',
+            mathjax: 'mathjax-full/es5',
             custom: '.'
         },
-        source: (argv.dist ? {} : require('mathjax3/components/src/source.js').source),
+        source: (argv.dist ? {} : require('mathjax-full/components/src/source.js').source),
         require: require,
         load: ['input/tex', 'adaptors/liteDOM', '[custom]/mml']
     },
     tex: {packages: argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/)},
     startup: {
-        ready: () => {
-            MathJax.startup.defaultReady();
+        pageReady: () => {
             MathJax.tex2mmlPromise(argv._[0] || '', {display: !argv.inline})
                 .then(mml => console.log(mml))
                 .catch(err => console.log(err));
@@ -43,8 +42,8 @@ MathJax = {
 };
 ```
 
-The `loader` block adds a new path named `custom` that is tied to the current directory.  This is used to load the custom extension (you could have several extensions in the same directory).  It also sets `require` for use with NodeJS, and asks MathJax to load the `tex` input component, the `liteDOM` adaptor, and the new custom `mml` extension.  (Note that we don't load an output jax in this example, since we are only converting to MathML, which is the internal format of MathJax.)
+The `loader` block adds a new path named `custom` that is tied to the current directory.  This is used to load the custom extension (you could have several extensions in the same directory).  It also sets `require` for use with node, and asks MathJax to load the `tex` input component, the `liteDOM` adaptor, and the new custom `mml` extension.  (Note that we don't load an output jax in this example, since we are only converting to MathML, which is the internal format of MathJax.)
 
 The `tex` configuration includes the `mml` package in the `package` array by default.
 
-Finally, the `startup` block configures the `ready()` function to do the default startup initialization, and then does a conversion from TeX to MathML, either printing the result, or an error message.  This gives you the chance to see the result of the `\mi`, `\mo`, etc. on the resulting MathML representation.
+Finally, the `startup` block configures the `pageReady()` function to do the default startup initialization, and then does a conversion from TeX to MathML, either printing the result, or an error message.  This gives you the chance to see the result of the `\mi`, `\mo`, etc. on the resulting MathML representation.

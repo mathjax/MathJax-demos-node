@@ -64,8 +64,8 @@ const htmlfile = require('fs').readFileSync(argv._[0], 'utf8');
 //
 MathJax = {
     loader: {
-        paths: {mathjax: 'mathjax3/components/dist', sre: 'mathjax3/mathjax3/a11y/sre'},
-        source: (argv.dist ? {} : require('mathjax3/components/src/source.js').source),
+        paths: {mathjax: 'mathjax-full/es5', sre: 'mathjax-full/js/a11y/sre'},
+        source: (argv.dist ? {} : require('mathjax-full/components/src/source.js').source),
         require: require,
         load: ['adaptors/liteDOM', 'a11y/semantic-enrich']
     },
@@ -96,4 +96,4 @@ MathJax = {
 //
 //  Load the MathJax startup module
 //
-require('mathjax3/components/' + (argv.dist ? 'dist' : 'src/mml-svg') + '/mml-svg.js');
+require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/mml-svg') + '/mml-svg.js');

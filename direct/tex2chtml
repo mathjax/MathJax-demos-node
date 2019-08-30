@@ -26,13 +26,13 @@
 //
 //  Load the packages needed for MathJax
 //
-const MathJax = require('mathjax3/mathjax3/mathjax.js').MathJax;
-const TeX = require('mathjax3/mathjax3/input/tex.js').TeX;
-const CHTML = require('mathjax3/mathjax3/output/chtml.js').CHTML;
-const liteAdaptor = require('mathjax3/mathjax3/adaptors/liteAdaptor.js').liteAdaptor;
-const RegisterHTMLHandler = require('mathjax3/mathjax3/handlers/html.js').RegisterHTMLHandler;
+const mathjax = require('mathjax-full/js/mathjax.js').mathjax;
+const TeX = require('mathjax-full/js/input/tex.js').TeX;
+const CHTML = require('mathjax-full/js/output/chtml.js').CHTML;
+const liteAdaptor = require('mathjax-full/js/adaptors/liteAdaptor.js').liteAdaptor;
+const RegisterHTMLHandler = require('mathjax-full/js/handlers/html.js').RegisterHTMLHandler;
 
-const AllPackages = require('mathjax3/mathjax3/input/tex/AllPackages.js').AllPackages;
+const AllPackages = require('mathjax-full/js/input/tex/AllPackages.js').AllPackages;
 
 //
 //  Get the command-line arguments
@@ -66,7 +66,7 @@ var argv = require('yargs')
             describe: 'output the required CSS rather than the HTML itself'
         },
         fontURL: {
-            default: 'https://cdn.rawgit.com/mathjax/mathjax-v3/3.0.0-beta.3/mathjax2/css/woff',
+            default: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.0.0/es5/output/chtml/fonts/woff-v2',
             describe: 'the URL to use for web fonts'
         }
     })
@@ -83,7 +83,7 @@ RegisterHTMLHandler(adaptor);
 //
 const tex = new TeX({packages: argv.packages.split(/\s*,\s*/)});
 const chtml = new CHTML({fontURL: argv.fontURL});
-const html = MathJax.document('', {InputJax: tex, OutputJax: chtml});
+const html = mathjax.document('', {InputJax: tex, OutputJax: chtml});
 
 //
 //  Typeset the math from the command line
@@ -92,7 +92,7 @@ const node = html.convert(argv._[0] || '', {
     display: !argv.inline,
     em: argv.em,
     ex: argv.ex,
-    cwidth: argv.width
+    containerWidth: argv.width
 });
 
 //

@@ -1,6 +1,6 @@
 # Preloaded Component Examples
 
-The examples in this directory illustrate how to use MathJax v3 components in your NodeJS projects by preloading the ones you need, and letting MathJax know which you have loaded.  That avoids the asynchronous startup process that MathJax usually uses to load the components (at the cost of your having to know which ones to load yourself, including any dependencies).  To operate completely synchronously, you would want to disable the `autoload` and `require` extensions by not including them in the `packages` array for the TeX input jax, or load the `all-packages` component so that there is no need to dynamically load extensions later.  Alternatively, you could use the promise-based typesetting and conversion functions and still be able to handle autoloading even though you have preloaded some components by hand.
+The examples in this directory illustrate how to use MathJax components in your node projects by preloading the ones you need, and letting MathJax know which you have loaded.  That avoids the asynchronous startup process that MathJax usually uses to load the components (at the cost of your having to know which ones to load yourself, including any dependencies).  To operate completely synchronously, you would want to disable the `autoload` and `require` extensions by not including them in the `packages` array for the TeX input jax, or load the `all-packages` component so that there is no need to dynamically load extensions later.  Alternatively, you could use the promise-based typesetting and conversion functions and still be able to handle autoloading even though you have preloaded some components by hand.
 
 All the examples in this directory consist of four main parts:
 
@@ -21,14 +21,14 @@ MathJax = {
 //
 //  Load all the needed components
 //
-require('mathjax3/components/src/startup/lib/startup.js');
-require('mathjax3/components/src/core/core.js');
-require('mathjax3/components/src/adaptors/liteDOM/liteDOM.js');
-require('mathjax3/components/src/input/tex-base/tex-base.js');
-require('mathjax3/components/src/input/tex/extensions/all-packages/all-packages.js');
-require('mathjax3/components/src/output/chtml/chtml.js');
-require('mathjax3/components/src/output/chtml/fonts/tex/tex.js');
-require('mathjax3/components/src/startup/startup.js');
+require('mathjax-full/components/src/startup/lib/startup.js');
+require('mathjax-full/components/src/core/core.js');
+require('mathjax-full/components/src/adaptors/liteDOM/liteDOM.js');
+require('mathjax-full/components/src/input/tex-base/tex-base.js');
+require('mathjax-full/components/src/input/tex/extensions/all-packages/all-packages.js');
+require('mathjax-full/components/src/output/chtml/chtml.js');
+require('mathjax-full/components/src/output/chtml/fonts/tex/tex.js');
+require('mathjax-full/components/src/startup/startup.js');
 
 //
 //  Let MathJax know these are loaded
@@ -43,7 +43,7 @@ MathJax.loader.preLoad(
 );
 ```
 
-The `MathJax` object simply configures the `tex`, `chtml`, and startup modules, and then the various components that we want to use are loaded.  The first `require()` statement is important in that it initializes the startup module so that the other modules can properly hook into it.  The `core` module should be loaded next, as it is needed by all the other modules.  We load `tex-base` rather than `tex`, since `all-packages` includes the other packages and there is no need to load duplicate code.  We load the `chtml` output component, and the `chtml/fonts/tex` component so that we have the font data as well.  Finally, we load the `startup` component (the first load was just its library).
+The `MathJax` object simply configures the `tex`, `chtml`, and startup modules, and then the various components that we want to use are loaded.  The first `require()` statement is important in that it initializes the startup module so that the other modules can properly hook into it.  The `core` module should be loaded next, as it is needed by all the other modules.  The `adaptors/liteDOM` is needed since we don't have a browser DOM to work with.  We load `tex-base` rather than `tex`, since `all-packages` includes the other packages and there is no need to load duplicate code.  We load the `chtml` output component, and the `chtml/fonts/tex` component so that we have the font data as well.  Finally, we load the `startup` component (the first load was just its library).
 
 Once the files are loaded and MathJax is told about them, we tell the startup module to initialize itself:
 
@@ -52,7 +52,7 @@ MathJax.config.startup.ready();
 const adaptor = MathJax.startup.adaptor;
 ```
 
-This creates the needed input and output jax, the DOM adaptor, and the internal MathDocument.  These are stored in the `MathJax.startup` object where we can retrieve them, if needed, as we do with the adaptor, here.
+This creates the needed input and output jax, the DOM adaptor, and the internal MathDocument.  These are stored in the `MathJax.startup` object where we can retrieve them, if needed, as we do with the `adaptor`, here.
 
 Finally, we do the conversion:
 
@@ -61,7 +61,7 @@ const node = MathJax.tex2chtml(argv._[0] || '', {
     display: !argv.inline,
     em: argv.em,
     ex: argv.ex,
-    cwidth: argv.width
+    containerWidth: argv.width
 });
 
 if (argv.css) {

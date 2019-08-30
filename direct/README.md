@@ -1,6 +1,6 @@
 # Non-Component-Based Examples
 
-The examples in this directory illustrate how to use MathJax v3 by directly importing the MathJax files into your project rather than using the MathJax predefined components.  While using components is easier, in general, this approach gives you the most control over what is included, and when it is loaded.
+The examples in this directory illustrate how to use MathJax by directly importing the MathJax files directly into your project rather than using the MathJax predefined components.  While using components is easier, in general, the direct approach gives you the most control over what is included, and when it is loaded.
 
 All the examples in this directory consist of four main parts:
 
@@ -12,16 +12,16 @@ All the examples in this directory consist of four main parts:
 These parts are described below using the `tex2chtml` command as an example.  It loads the following MathJax values:
 
 ```
-const MathJax = require('mathjax3/mathjax3/mathjax.js').MathJax;
-const TeX = require('mathjax3/mathjax3/input/tex.js').TeX;
-const CHTML = require('mathjax3/mathjax3/output/chtml.js').CHTML;
-const liteAdaptor = require('mathjax3/mathjax3/adaptors/liteAdaptor.js').liteAdaptor;
-const RegisterHTMLHandler = require('mathjax3/mathjax3/handlers/html.js').RegisterHTMLHandler;
+const mathlax = require('mathjax-full/js/mathjax.js').mathjax;
+const TeX = require('mathjax-full/js/input/tex.js').TeX;
+const CHTML = require('mathjax-full/js/output/chtml.js').CHTML;
+const liteAdaptor = require('mathjax-full/js/adaptors/liteAdaptor.js').liteAdaptor;
+const RegisterHTMLHandler = require('mathjax-full/js/handlers/html.js').RegisterHTMLHandler;
 
-const AllPackages = require('mathjax3/mathjax3/input/tex/AllPackages.js').AllPackages;
+const AllPackages = require('mathjax-full/js/input/tex/AllPackages.js').AllPackages;
 ```
 
-The `TeX` and `CHTML` objects are the input and output jax class constructors, the `liteAdaptor` is the constructor for the liteDOM adaptor, and `RegisterHTMLHandler` is a function used to tell MathJax that we want to work with HTML documents (using a particular DOM adaptor).  Finally, `AllPackages` is an array of the package names to use to initialize the TeX input jax; it includes all the available TeX packages except `autoload` and `require` (which rely on the component system to operate), and `physics`, which has been loaded, but isn't included in the package array by default since it redefines many standard macros.  You can add `'physics'` to the array if you want to include it yourself.
+The `TeX` and `CHTML` objects are the input and output jax class constructors, the `liteAdaptor` is the constructor for the liteDOM adaptor, and `RegisterHTMLHandler` is a function used to tell MathJax that we want to work with HTML documents (using a particular DOM adaptor).  Finally, `AllPackages` is an array of the package names to use to initialize the TeX input jax; it includes all the available TeX packages except `autoload` and `require` (which rely on the component system to operate), and `physics` and `colorV2`, which have been loaded, but aren't included in the package array by default since `physics` redefines many standard macros and `color` is used rather than `colorV2` for the `\color` macro.  You can add `'physics'` to the array if you want to include it yourself.
 
 Next we create the needed MathJax objects:
 
@@ -31,7 +31,7 @@ RegisterHTMLHandler(adaptor);
 
 const tex = new TeX({packages: argv.packages.split(/\s*,\s*/)});
 const chtml = new CHTML({fontURL: argv.fontURL});
-const html = MathJax.document('', {InputJax: tex, OutputJax: chtml});
+const html = mathjax.document('', {InputJax: tex, OutputJax: chtml});
 ```
 
 Here we create the `liteDOM` adaptor and use it to tell MathJax that we will use HTML documents with the `liteDOM` implementation of the DOM.  Then we create the input and output jax, and create an empty document (based on the `liteDOM`) with those input and output jax.
@@ -43,7 +43,7 @@ const node = html.convert(argv._[0] || '', {
     display: !argv.inline,
     em: argv.em,
     ex: argv.ex,
-    cwidth: argv.width
+    containerWidth: argv.width
 });
 
 if (argv.css) {

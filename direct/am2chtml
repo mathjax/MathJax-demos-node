@@ -2,9 +2,9 @@
 
 /*************************************************************************
  *
- *  speech/mml2svg
+ *  direct/am2chtml
  *
- *  Uses MathJax v3 to convert a MathML string to an SVG string with speech.
+ *  Uses MathJax v3 to convert a MathML string to an HTML string.
  *
  * ----------------------------------------------------------------------
  *
@@ -42,18 +42,13 @@ var argv = require('yargs')
             default: 80 * 16,
             describe: 'width of container in pixels'
         },
-        speech: {
-            default: 'shallow',
-            describe: 'level of speech: deep, shallow, none'
-        },
         css: {
             boolean: true,
-            describe: 'output the required CSS rather than the SVG itself'
+            describe: 'output the required CSS rather than the HTML itself'
         },
-        fontCache: {
-            boolean: true,
-            default: true,
-            describe: 'whether to use a local font cache or not'
+        fontURL: {
+            default: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.0.0/es5/output/chtml/fonts/woff-v2',
+            describe: 'the URL to use for web fonts'
         }
     })
     .argv;
@@ -62,31 +57,23 @@ var argv = require('yargs')
 //  Load the packages needed for MathJax
 //
 const mathjax = require('mathjax-full/js/mathjax.js').mathjax;
-require('mathjax-full/js/util/asyncLoad/node.js');
-
-const MathML = require('mathjax-full/js/input/mathml.js').MathML;
-const SVG = require('mathjax-full/js/output/svg.js').SVG;
+const AsciiMath = require('mathjax-full/js/input/asciimath.js').AsciiMath;
+const CHTML = require('mathjax-full/js/output/chtml.js').CHTML;
 const liteAdaptor = require('mathjax-full/js/adaptors/liteAdaptor.js').liteAdaptor;
 const RegisterHTMLHandler = require('mathjax-full/js/handlers/html.js').RegisterHTMLHandler;
-const EnrichHandler = require('mathjax-full/js/a11y/semantic-enrich.js').EnrichHandler;
 
 //
 //  Create DOM adaptor and register it for HTML documents
 //
-const adaptor = liteAdaptor();
-EnrichHandler(RegisterHTMLHandler(adaptor), new MathML());
+const adaptor = liteAdaptor({fontSize: argv.em});
+RegisterHTMLHandler(adaptor);
 
 //
 //  Create input and output jax and a document using them on the content from the HTML file
 //
-const mml = new MathML();
-const svg = new SVG({fontCache: (argv.fontCache ? 'local' : 'none')});
-const html = mathjax.document('', {
-    InputJax: mml,
-    OutputJax: svg,
-    enrichSpeech: argv.speech,
-    renderActions: require('./action.js').speechAction
-});
+const asciimath = new AsciiMath();
+const chtml = new CHTML({fontURL: argv.fontURL});
+const html = mathjax.document('', {InputJax: asciimath, OutputJax: chtml});
 
 //
 //  Typeset the math from the command line
@@ -103,7 +90,7 @@ const node = html.convert(argv._[0] || '', {
 //  Otherwise, typeset the math and output the HTML
 //
 if (argv.css) {
-    console.log(adaptor.textContent(svg.styleSheet(html)));
+    console.log(adaptor.textContent(chtml.styleSheet(html)));
 } else {
     console.log(adaptor.outerHTML(node));
 }

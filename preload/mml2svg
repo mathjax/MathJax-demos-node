@@ -70,8 +70,8 @@ MathJax = {
 //
 //  Load the needed components
 //
-require('mathjax3/components/src/mml-svg/mml-svg.js');
-require('mathjax3/components/src/adaptors/liteDOM/liteDOM.js');
+require('mathjax-full/components/src/mml-svg/mml-svg.js');
+require('mathjax-full/components/src/adaptors/liteDOM/liteDOM.js');
 
 //
 //  Let MathJax know these are loaded
@@ -94,7 +94,7 @@ const node = MathJax.mathml2svg(argv._[0] || '', {
     display: !argv.inline,
     em: argv.em,
     ex: argv.ex,
-    cwidth: argv.width
+    containerWidth: argv.width
 });
 
 //

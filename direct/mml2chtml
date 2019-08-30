@@ -47,7 +47,7 @@ var argv = require('yargs')
             describe: 'output the required CSS rather than the HTML itself'
         },
         fontURL: {
-            default: 'https://cdn.rawgit.com/mathjax/mathjax-v3/3.0.0-beta.3/mathjax2/css/woff',
+            default: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.0.0/es5/output/chtml/fonts/woff-v2',
             describe: 'the URL to use for web fonts'
         }
     })
@@ -56,11 +56,11 @@ var argv = require('yargs')
 //
 //  Load the packages needed for MathJax
 //
-const MathJax = require('mathjax3/mathjax3/mathjax.js').MathJax;
-const MathML = require('mathjax3/mathjax3/input/mathml.js').MathML;
-const CHTML = require('mathjax3/mathjax3/output/chtml.js').CHTML;
-const liteAdaptor = require('mathjax3/mathjax3/adaptors/liteAdaptor.js').liteAdaptor;
-const RegisterHTMLHandler = require('mathjax3/mathjax3/handlers/html.js').RegisterHTMLHandler;
+const mathjax = require('mathjax-full/js/mathjax.js').mathjax;
+const MathML = require('mathjax-full/js/input/mathml.js').MathML;
+const CHTML = require('mathjax-full/js/output/chtml.js').CHTML;
+const liteAdaptor = require('mathjax-full/js/adaptors/liteAdaptor.js').liteAdaptor;
+const RegisterHTMLHandler = require('mathjax-full/js/handlers/html.js').RegisterHTMLHandler;
 
 //
 //  Create DOM adaptor and register it for HTML documents
@@ -73,7 +73,7 @@ RegisterHTMLHandler(adaptor);
 //
 const mml = new MathML();
 const chtml = new CHTML({fontURL: argv.fontURL});
-const html = MathJax.document('', {InputJax: mml, OutputJax: chtml});
+const html = mathjax.document('', {InputJax: mml, OutputJax: chtml});
 
 //
 //  Typeset the math from the command line
@@ -82,7 +82,7 @@ const node = html.convert(argv._[0] || '', {
     display: !argv.inline,
     em: argv.em,
     ex: argv.ex,
-    cwidth: argv.width
+    containerWidth: argv.width
 });
 
 //

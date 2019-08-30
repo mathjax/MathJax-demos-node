@@ -2,9 +2,9 @@
 
 /*************************************************************************
  *
- *  component/tex2svg-page
+ *  component/am2mml
  *
- *  Uses MathJax v3 to convert all TeX in an SVG document.
+ *  Uses MathJax v3 to convert an AsciiMath string to a MathML string.
  *
  * ----------------------------------------------------------------------
  *
@@ -23,17 +23,13 @@
  *  limitations under the License.
  */
 
-//
-//  The default TeX packages to use
-//
-const PACKAGES = 'base, autoload, require, ams, newcommand';
 
 //
 //  Get the command-line arguments
 //
 var argv = require('yargs')
     .demand(0).strict()
-    .usage('$0 [options] file.html > converted.html')
+    .usage('$0 [options] "math"')
     .options({
         em: {
             default: 16,
@@ -43,13 +39,9 @@ var argv = require('yargs')
             default: 8,
             describe: 'ex-size in pixels'
         },
-        packages: {
-            default: PACKAGES,
-            describe: 'the packages to use, e.g. "base, ams"; use "*" to represent the default packages, e.g, "*, bbox"'
-        },
-        fontCache: {
-            default: 'global',
-            describe: 'cache type: local, global, none'
+        width: {
+            default: 80 * 16,
+            describe: 'width of container in pixels'
         },
         dist: {
             boolean: true,
@@ -60,39 +52,24 @@ var argv = require('yargs')
     .argv;
 
 //
-//  Read the HTML file
-//
-const htmlfile = require('fs').readFileSync(argv._[0], 'utf8');
-
-//
-// Configure MathJax
+//  Configure MathJax
 //
 MathJax = {
     loader: {
         paths: {mathjax: 'mathjax-full/es5'},
         source: (argv.dist ? {} : require('mathjax-full/components/src/source.js').source),
         require: require,
-        load: ['input/tex-full', 'output/svg', 'adaptors/liteDOM']
-    },
-    tex: {
-        packages: argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/)
-    },
-    svg: {
-        fontCache: argv.fontCache,
-        exFactor: argv.ex / argv.em
-    },
-    'adaptors/liteDOM': {
-        fontSize: argv.em
+        load: ['input/asciimath', 'adaptors/liteDom']
     },
     startup: {
-        document: htmlfile,
-        ready: () => {
-            MathJax.startup.defaultReady();
-            const adaptor = MathJax.startup.adaptor;
-            const html = MathJax.startup.document;
-            MathJax.startup.promise
-                .then(() => console.log(adaptor.outerHTML(adaptor.root(html.document))))
-                .catch(err => console.log(err));
+        pageReady: () => {
+            MathJax.asciimath2mmlPromise(argv._[0] || '', {
+                display: false,
+                em: argv.em,
+                ex: argv.ex,
+                containerWidth: argv.width
+            }).then(mml => console.log(mml))
+              .catch(err => console.log(err));
         }
     }
 }
@@ -101,3 +78,4 @@ MathJax = {
 //  Load the MathJax startup module
 //
 require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/startup') + '/startup.js');
+

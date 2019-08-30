@@ -39,13 +39,13 @@ var argv = require('yargs')
             describe: 'ex-size in pixels'
         },
         fontURL: {
-            default: 'https://cdn.rawgit.com/mathjax/mathjax-v3/3.0.0-beta.4/mathjax2/css/woff',
+            default: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.0.0/es5/output/chtml/fonts/woff-v2',
             describe: 'the URL to use for web fonts'
         },
         dist: {
             boolean: true,
             default: false,
-            describe: 'true to use webpacked version, false to use mathjax3 source files'
+            describe: 'true to use webpacked version, false to use MathJax source files'
         }
     })
     .argv;
@@ -60,8 +60,8 @@ const htmlfile = require('fs').readFileSync(argv._[0], 'utf8');
 //
 MathJax = {
     loader: {
-        paths: {mathjax: 'mathjax3/components/dist'},
-        source: (argv.dist ? {} : require('mathjax3/components/src/source.js').source),
+        paths: {mathjax: 'mathjax-full/es5'},
+        source: (argv.dist ? {} : require('mathjax-full/components/src/source.js').source),
         require: require,
         load: ['input/mml', 'output/chtml', 'adaptors/liteDOM']
     },
@@ -88,4 +88,4 @@ MathJax = {
 //
 //  Load the MathJax startup module
 //
-require('mathjax3/components/' + (argv.dist ? 'dist' : 'src/startup') + '/startup.js');
+require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/startup') + '/startup.js');

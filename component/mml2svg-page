@@ -45,7 +45,7 @@ var argv = require('yargs')
         dist: {
             boolean: true,
             default: false,
-            describe: 'true to use webpacked version, false to use mathjax3 source files'
+            describe: 'true to use webpacked version, false to use MathJax source files'
         }
     })
     .argv;
@@ -60,8 +60,8 @@ const htmlfile = require('fs').readFileSync(argv._[0], 'utf8');
 //
 MathJax = {
     loader: {
-        paths: {mathjax: 'mathjax3/components/dist'},
-        source: (argv.dist ? {} : require('mathjax3/components/src/source.js').source),
+        paths: {mathjax: 'mathjax-full/es5'},
+        source: (argv.dist ? {} : require('mathjax-full/components/src/source.js').source),
         require: require,
         load: ['adaptors/liteDOM']
     },
@@ -88,4 +88,4 @@ MathJax = {
 //
 //  Load the MathJax startup module
 //
-require('mathjax3/components/' + (argv.dist ? 'dist' : 'src/mml-svg') + '/mml-svg.js');
+require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/mml-svg') + '/mml-svg.js');

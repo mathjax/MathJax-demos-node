@@ -61,8 +61,8 @@ var argv = require('yargs')
 //
 MathJax = {
     loader: {
-        paths: {mathjax: 'mathjax3/components/dist', sre: 'mathjax3/mathjax3/a11y/sre-node'},
-        source: (argv.dist ? {} : require('mathjax3/components/src/source.js').source),
+        paths: {mathjax: 'mathjax-full/es5', sre: 'mathjax-full/js/a11y/sre-node'},
+        source: (argv.dist ? {} : require('mathjax-full/components/src/source.js').source),
         require: require,
         load: ['input/tex-full', 'adaptors/liteDOM', 'a11y/semantic-enrich']
     },
@@ -86,5 +86,5 @@ MathJax = {
 //
 //  Load the MathJax startup module
 //
-require('mathjax3/components/' + (argv.dist ? 'dist' : 'src/startup') + '/startup.js');
+require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/startup') + '/startup.js');
 

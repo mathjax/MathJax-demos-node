@@ -1,13 +1,10 @@
 {
-  "name": "mj3-demos-node",
-  "version": "3.0.0-beta.4",
-  "description": "Demos using MathJax v3 beta in NodeJS",
-  "scripts": {
-    "make-components": "cd node_modules/mathjax3/components && bin/makeAll src"
-  },
+  "name": "MathJax-demos-node",
+  "version": "3.0.0",
+  "description": "Demos using MathJax v3 in node",
   "dependencies": {
     "esm": "^3.0.34",
-    "mathjax3": "^3.0.0-beta.4",
+    "mathjax-full": "git://github.com/mathjax/MathJax-v3.git",
     "yargs": "^11.0.0"
   },
   "devDependencies": {
@@ -17,16 +14,17 @@
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.4",
     "babel-preset-env": "^1.6.1",
-    "uglifyjs-webpack-plugin": "^1.2.4",
+    "uglifyjs-webpack-plugin": "^2.1.2",
     "webpack": "^4.19.0",
     "webpack-cli": "^3.3.2"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/mathjax/mj3-demos-node/"
+    "url": "https://github.com/mathjax/MathJax-demos-node/"
   },
   "keywords": [
     "MathJax",
+    "examples",
     "nodejs"
   ],
   "license": "Apache-2.0"

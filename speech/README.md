@@ -5,19 +5,19 @@ This example shows how to use MathJax's `semantic-enrich` extension to generate 
 The main steps needed for this are to:
 
 1. Load the `a11y/semantic-enrich` extension,
-2. Configure extension to generate deep or shallow speech strings, and
+2. Configure the extension to generate deep or shallow speech strings, and
 3. Add a custom `renderAction` to the math document that removes all non-speech attributes added by the enrichment process.
 
 Most of the examples in this directory use the MathJax [components approach](../component) to accomplish this, but the `mml2svg` example uses the [direct approach](../direct) in order to illustrate that as well.
 
-## Component-Base Example
+## Component-Based Example
 
 We use the [`tex2chtml`](tex2chtml) code as an example.  The key pieces are the following lines from the configuration:
 
 ```
     loader: {
         paths: {
-          sre: 'mathjax3/mathjax3/a11y/sre-node'
+          sre: 'mathjax-full/es5/a11y/sre-node'
         },
         load: ['adaptors/liteDOM', 'a11y/semantic-enrich']
     },
@@ -38,7 +38,7 @@ The rest of the file is the same as the standard `tex2chtml` using components.  
 The [`mml2svg`](mml2svg) example uses the [direct import](../direct) approach.  The key additions in this case are
 
 ```
-const EnrichHandler = require('mathjax3/mathjax3/a11y/semantic-enrich.js').EnrichHandler;
+const EnrichHandler = require('mathjax-full/es5/a11y/semantic-enrich.js').EnrichHandler;
 ```
 
 which loads a function used to augment the HTML handler to include the enrichment functions.  It is used in

@@ -1,6 +1,6 @@
-require('mathjax3/mathjax3/util/asyncLoad/node.js');
-require('mathjax3/mathjax3/a11y/semantic-enrich.js');
-const STATE = require('mathjax3/mathjax3/core/MathItem.js').STATE;
+require('mathjax-full/js/util/asyncLoad/node.js');
+require('mathjax-full/js/a11y/semantic-enrich.js');
+const STATE = require('mathjax-full/js/core/MathItem.js').STATE;
 
 //
 //  Remove the data-semantic-* attributes other than data-semantic-speech
