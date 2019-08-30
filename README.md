@@ -2,7 +2,7 @@
 
 A repository with examples using [MathJax version 3](https://github.com/mathjax/MathJax-src) in node applications.
 
-See the [MathJax Node Demos](https://github.com/mathjax/MathJax-demos-node) for examples of how to use MathJax in node applications.  See the [MathJax documentation](https://docs.mathjax.org/) for complete details of how to use MathJax in web browsers and node.
+See the [MathJax Web Demos](https://github.com/mathjax/MathJax-demos-web) for examples of how to use MathJax in web pages.  See the [MathJax documentation](https://docs.mathjax.org/) for complete details of how to use MathJax in web browsers and node.
 
 ## The Example files
 
