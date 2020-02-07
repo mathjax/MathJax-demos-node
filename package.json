@@ -1,10 +1,10 @@
 {
   "name": "MathJax-demos-node",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Demos using MathJax v3 in node",
   "dependencies": {
     "esm": "^3.0.34",
-    "mathjax-full": "^3.0.0",
+    "mathjax-full": "^3.0.1",
     "yargs": "^11.0.0"
   },
   "devDependencies": {
@@ -14,9 +14,9 @@
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.4",
     "babel-preset-env": "^1.6.1",
-    "uglifyjs-webpack-plugin": "^2.1.2",
-    "webpack": "^4.19.0",
-    "webpack-cli": "^3.3.2"
+    "uglifyjs-webpack-plugin": "^2.2.0",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
   },
   "repository": {
     "type": "git",
