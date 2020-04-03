@@ -1,5 +1,5 @@
 # [MathJax-demos-node](https://github.com/mathjax/MathJax-demos-node)
-<img class="shield" alt="GitHub release version" src="https://img.shields.io/github/v/release/mathjax/MathJax-src?sort=semver">
+<img class="shield" alt="GitHub release version" src="https://img.shields.io/github/v/release/mathjax/MathJax-src.svg?sort=semver">
 
 A repository with examples using [MathJax version 3](https://github.com/mathjax/MathJax-src) in node applications.
 
