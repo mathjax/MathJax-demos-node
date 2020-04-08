@@ -12,7 +12,7 @@ All the examples in this directory consist of four main parts:
 These parts are described below using the `tex2chtml` command as an example.  It loads the following MathJax values:
 
 ```
-const mathlax = require('mathjax-full/js/mathjax.js').mathjax;
+const mathjax = require('mathjax-full/js/mathjax.js').mathjax;
 const TeX = require('mathjax-full/js/input/tex.js').TeX;
 const CHTML = require('mathjax-full/js/output/chtml.js').CHTML;
 const liteAdaptor = require('mathjax-full/js/adaptors/liteAdaptor.js').liteAdaptor;
