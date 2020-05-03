@@ -11,7 +11,7 @@ All the examples in this directory consist of four main parts:
 
 These parts are described below using the `tex2chtml` command as an example.  The configuration and loading of components is accomplished via
 
-```
+```js
 MathJax = {
     tex: {packages: argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/)},
     chtml: {fontURL: argv.fontURL},
@@ -47,7 +47,7 @@ The `MathJax` object simply configures the `tex`, `chtml`, and startup modules, 
 
 Once the files are loaded and MathJax is told about them, we tell the startup module to initialize itself:
 
-```
+```js
 MathJax.config.startup.ready();
 const adaptor = MathJax.startup.adaptor;
 ```
@@ -56,7 +56,7 @@ This creates the needed input and output jax, the DOM adaptor, and the internal 
 
 Finally, we do the conversion:
 
-```
+```js
 const node = MathJax.tex2chtml(argv._[0] || '', {
     display: !argv.inline,
     em: argv.em,
