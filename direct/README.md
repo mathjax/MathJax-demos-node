@@ -11,7 +11,7 @@ All the examples in this directory consist of four main parts:
 
 These parts are described below using the `tex2chtml` command as an example.  It loads the following MathJax values:
 
-```
+```js
 const mathjax = require('mathjax-full/js/mathjax.js').mathjax;
 const TeX = require('mathjax-full/js/input/tex.js').TeX;
 const CHTML = require('mathjax-full/js/output/chtml.js').CHTML;
@@ -25,7 +25,7 @@ The `TeX` and `CHTML` objects are the input and output jax class constructors, t
 
 Next we create the needed MathJax objects:
 
-```
+```js
 const adaptor = liteAdaptor();
 RegisterHTMLHandler(adaptor);
 
@@ -38,7 +38,7 @@ Here we create the `liteDOM` adaptor and use it to tell MathJax that we will use
 
 Finally, we do the conversion:
 
-```
+```js
 const node = html.convert(argv._[0] || '', {
     display: !argv.inline,
     em: argv.em,

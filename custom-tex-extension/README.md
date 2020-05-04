@@ -14,13 +14,13 @@ The key portions of the [code](tex2mml) used to do this is described below.
 
 First, we add the `mml` package to the default list of packages:
 
-```
+```js
 const PACKAGES = 'base, autoload, require, ams, newcommand, mml';
 ```
 
 Then we configure MathJax to know about the new package:
 
-```
+```js
 MathJax = {
     loader: {
         paths: {

@@ -14,17 +14,17 @@ Most of the examples in this directory use the MathJax [components approach](../
 
 We use the [`tex2chtml`](tex2chtml) code as an example.  The key pieces are the following lines from the configuration:
 
-```
-    loader: {
-        paths: {
-          sre: 'mathjax-full/es5/a11y/sre-node'
-        },
-        load: ['adaptors/liteDOM', 'a11y/semantic-enrich']
+```js
+loader: {
+    paths: {
+      sre: 'mathjax-full/es5/a11y/sre-node'
     },
-    options: {
-        enrichSpeech: argv.speech,
-        renderActions: require('./action.js').speechAction
-    },
+    load: ['adaptors/liteDOM', 'a11y/semantic-enrich']
+},
+options: {
+    enrichSpeech: argv.speech,
+    renderActions: require('./action.js').speechAction
+},
 ```
 
 The `loader` section sets up the path to the speech-rule-engine (SRE), which is used to load the node-based version of SRE (there are separate browser and node versions), and includes the `a11y/semantic-enrich` component in the list to be loaded.
@@ -37,13 +37,13 @@ The rest of the file is the same as the standard `tex2chtml` using components.  
 
 The [`mml2svg`](mml2svg) example uses the [direct import](../direct) approach.  The key additions in this case are
 
-```
+```js
 const EnrichHandler = require('mathjax-full/es5/a11y/semantic-enrich.js').EnrichHandler;
 ```
 
 which loads a function used to augment the HTML handler to include the enrichment functions.  It is used in
 
-```
+```js
 EnrichHandler(RegisterHTMLHandler(adaptor), new MathML());
 ```
 
@@ -51,7 +51,7 @@ to modify the handler that is register by `RegisterHTMLHandler()`, creating a ne
 
 Finally, the lines
 
-```
+```js
 const html = MathJax.document('', {
     InputJax: mml,
     OutputJax: svg,

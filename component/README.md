@@ -16,7 +16,7 @@ Other than these considerations, the configuration and usage of MathJax in node 
 
 An example of the configuration for the `tex2chtml` example is given below.  The `argv` object contains the command-line arguments and option values:
 
-```
+```js
 MathJax = {
     loader: {
         paths: {mathjax: 'mathjax-full/es5'},
@@ -61,6 +61,8 @@ The function we provide for `pageReady()` uses the `tex2chtmlPromise()` command 
 
 Once the configuration is set, the last thing to do is load the startup component:
 
-    require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/startup') + '/startup.js');
+```js
+require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/startup') + '/startup.js');
+```
 
 This loads either the distribution or the source version, depending on which was requested by the command-line options.
