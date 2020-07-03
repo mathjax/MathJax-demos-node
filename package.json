@@ -1,6 +1,6 @@
 {
   "name": "MathJax-demos-node",
-  "version": "3.0.1",
+  "version": "3.0.5",
   "description": "Demos using MathJax v3 in node",
   "dependencies": {
     "esm": "^3.0.34",
