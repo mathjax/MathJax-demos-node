@@ -4,7 +4,7 @@
   "description": "Demos using MathJax v3 in node",
   "dependencies": {
     "esm": "^3.0.34",
-    "mathjax-full": "^3.0.1",
+    "mathjax-full": "^3.0.5",
     "yargs": "^11.0.0"
   },
   "devDependencies": {
