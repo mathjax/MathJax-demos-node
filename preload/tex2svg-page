@@ -119,4 +119,5 @@ MathJax.config.startup.ready();
 MathJax.typeset();
 const adaptor = MathJax.startup.adaptor;
 const html = MathJax.startup.document;
+console.log(adaptor.doctype(html.document));
 console.log(adaptor.outerHTML(adaptor.root(html.document)));
