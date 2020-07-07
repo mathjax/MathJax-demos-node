@@ -76,10 +76,6 @@ MathJax = {
     },
     tex: {
         packages: argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/)
-    },
-    startup: {
-        pageReady: () => {
-        }
     }
 }
 

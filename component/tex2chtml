@@ -97,7 +97,7 @@ MathJax = {
         fontURL: argv.fontURL
     },
     startup: {
-        typeset: false,
+        typeset: false
     }
 }
 
