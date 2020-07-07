@@ -69,27 +69,11 @@ MathJax = {
         require: require,
         load: ['input/asciimath', 'output/chtml', 'adaptors/liteDOM']
     },
-    chtml: {fontURL: argv.fontURL},
+    chtml: {
+        fontURL: argv.fontURL
+    },
     startup: {
-        pageReady: () => {
-            MathJax.asciimath2chtmlPromise(argv._[0] || '', {
-                display: false,
-                em: argv.em,
-                ex: argv.ex,
-                containerWidth: argv.width
-            }).then(node => {
-                const adaptor = MathJax.startup.adaptor;
-                //
-                //  If the --css option was specified, output the CSS,
-                //  Otherwise, output the typeset math as HTML
-                //
-                if (argv.css) {
-                    console.log(adaptor.textContent(MathJax.chtmlStylesheet()));
-                } else {
-                    console.log(adaptor.outerHTML(node));
-                };
-            }).catch(err => console.log(err));
-        }
+        typeset: false
     }
 }
 
@@ -98,3 +82,25 @@ MathJax = {
 //
 require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/startup') + '/startup.js');
 
+//
+//  Wait for MathJax to start up, and then typeset the math
+//
+MathJax.startup.promise.then(() => {
+    MathJax.asciimath2chtmlPromise(argv._[0] || '', {
+        display: !argv.inline,
+        em: argv.em,
+        ex: argv.ex,
+        containerWidth: argv.width
+    }).then((node) => {
+        const adaptor = MathJax.startup.adaptor;
+        //
+        //  If the --css option was specified, output the CSS,
+        //  Otherwise, output the typeset math as HTML
+        //
+        if (argv.css) {
+            console.log(adaptor.textContent(MathJax.chtmlStylesheet()));
+        } else {
+            console.log(adaptor.outerHTML(node));
+        };
+    });
+}).catch(err => console.log(err));

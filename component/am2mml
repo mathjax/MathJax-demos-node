@@ -62,15 +62,7 @@ MathJax = {
         load: ['input/asciimath', 'adaptors/liteDom']
     },
     startup: {
-        pageReady: () => {
-            MathJax.asciimath2mmlPromise(argv._[0] || '', {
-                display: false,
-                em: argv.em,
-                ex: argv.ex,
-                containerWidth: argv.width
-            }).then(mml => console.log(mml))
-              .catch(err => console.log(err));
-        }
+        typeset: false
     }
 }
 
@@ -79,3 +71,14 @@ MathJax = {
 //
 require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/startup') + '/startup.js');
 
+//
+//  Wait for MathJax to start up, and then typeset the math
+//
+MathJax.startup.promise.then(() => {
+    MathJax.asciimath2mmlPromise(argv._[0] || '', {
+        display: !argv.inline,
+        em: argv.em,
+        ex: argv.ex,
+        containerWidth: argv.width
+    }).then(mml => console.log(mml));
+}).catch(err => console.log(err));

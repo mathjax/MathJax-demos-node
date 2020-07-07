@@ -72,7 +72,7 @@ MathJax = {
         paths: {mathjax: 'mathjax-full/es5'},
         source: (argv.dist ? {} : require('mathjax-full/components/src/source.js').source),
         require: require,
-        load: ['input/tex-full', 'output/chtml', 'adaptors/liteDOM']
+        load: ['adaptors/liteDOM']
     },
     tex: {
         packages: argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/)
@@ -85,19 +85,23 @@ MathJax = {
         fontSize: argv.em
     },
     startup: {
-        document: htmlfile,
-        ready: () => {
-            MathJax.startup.defaultReady();
-            const adaptor = MathJax.startup.adaptor;
-            const html = MathJax.startup.document;
-            MathJax.startup.promise
-                .then(() => console.log(adaptor.outerHTML(adaptor.root(html.document))))
-                .catch(err => console.log(err));
-        }
+        document: htmlfile
     }
 }
 
 //
 //  Load the MathJax startup module
 //
-require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/startup') + '/startup.js');
+require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/tex-chtml') + '/tex-chtml.js');
+
+//
+//  Wait for MathJax to start up, and then typeset the math
+//
+MathJax.startup.promise.then(() => {
+    const adaptor = MathJax.startup.adaptor;
+    const html = MathJax.startup.document;
+    MathJax.startup.promise.then(() => {
+        console.log(adaptor.doctype(html.document));
+        console.log(adaptor.outerHTML(adaptor.root(html.document)));
+    });
+}).catch(err => console.log(err));

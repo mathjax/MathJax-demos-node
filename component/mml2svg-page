@@ -63,7 +63,7 @@ MathJax = {
         paths: {mathjax: 'mathjax-full/es5'},
         source: (argv.dist ? {} : require('mathjax-full/components/src/source.js').source),
         require: require,
-        load: ['adaptors/liteDOM']
+        load: ['adaptors/liteDOM', 'input/mml/entities']
     },
     svg: {
         fontCache: argv.fontCache,
@@ -73,15 +73,7 @@ MathJax = {
         fontSize: argv.em
     },
     startup: {
-        document: htmlfile,
-        ready: () => {
-            MathJax.startup.defaultReady();
-            const adaptor = MathJax.startup.adaptor;
-            const html = MathJax.startup.document;
-            MathJax.startup.promise
-                .then(() => console.log(adaptor.outerHTML(adaptor.root(html.document))))
-                .catch(err => console.log(err));
-        }
+        document: htmlfile
     }
 }
 
@@ -89,3 +81,15 @@ MathJax = {
 //  Load the MathJax startup module
 //
 require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/mml-svg') + '/mml-svg.js');
+
+//
+//  Wait for MathJax to start up, and then typeset the math
+//
+MathJax.startup.promise.then(() => {
+    const adaptor = MathJax.startup.adaptor;
+    const html = MathJax.startup.document;
+    MathJax.startup.promise.then(() => {
+        console.log(adaptor.doctype(html.document));
+        console.log(adaptor.outerHTML(adaptor.root(html.document)));
+    });
+}).catch(err => console.log(err));

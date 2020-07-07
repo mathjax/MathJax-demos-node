@@ -65,6 +65,11 @@ var argv = require('yargs')
             default: true,
             describe: 'whether to use a local font cache or not'
         },
+        assistiveMml: {
+            boolean: true,
+            default: false,
+            describe: 'whether to include assistive MathML output'
+        },
         dist: {
             boolean: true,
             default: false,
@@ -77,40 +82,50 @@ var argv = require('yargs')
 // Configure MathJax
 //
 MathJax = {
+    options: {
+        enableAssistiveMml: argv.assistiveMml
+    },
     loader: {
         paths: {mathjax: 'mathjax-full/es5'},
         source: (argv.dist ? {} : require('mathjax-full/components/src/source.js').source),
         require: require,
-        load: ['input/tex-full', 'output/svg', 'adaptors/liteDOM']
+        load: ['adaptors/liteDOM']
     },
-    tex: {packages: argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/)},
-    svg: {fontCache: (argv.fontCache ? 'local' : 'none')},
+    tex: {
+        packages: argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/)
+    },
+    svg: {
+        fontCache: (argv.fontCache ? 'local' : 'none')
+    },
     startup: {
-        typeset: false,
-        pageReady: () => {
-            MathJax.tex2svgPromise(argv._[0] || '', {
-                display: !argv.inline,
-                em: argv.em,
-                ex: argv.ex,
-                containerWidth: argv.width
-            }).then((node) => {
-                const adaptor = MathJax.startup.adaptor;
-                //
-                //  If the --css option was specified, output the CSS,
-                //  Otherwise, output the typeset math as SVG
-                //
-                if (argv.css) {
-                    console.log(adaptor.textContent(MathJax.svgStylesheet()));
-                } else {
-                    console.log(adaptor.outerHTML(node));
-                };
-            }).catch(err => console.log(err));
-        }
+        typeset: false
     }
 }
 
 //
 //  Load the MathJax startup module
 //
-require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/startup') + '/startup.js');
+require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/tex-svg') + '/tex-svg.js');
 
+//
+//  Wait for MathJax to start up, and then typeset the math
+//
+MathJax.startup.promise.then(() => {
+    MathJax.tex2svgPromise(argv._[0] || '', {
+        display: !argv.inline,
+        em: argv.em,
+        ex: argv.ex,
+        containerWidth: argv.width
+    }).then((node) => {
+        const adaptor = MathJax.startup.adaptor;
+        //
+        //  If the --css option was specified, output the CSS,
+        //  Otherwise, output the typeset math as SVG
+        //
+        if (argv.css) {
+            console.log(adaptor.textContent(MathJax.svgStylesheet()));
+        } else {
+            console.log(adaptor.outerHTML(node));
+        };
+    });
+}).catch(err => console.log(err));
