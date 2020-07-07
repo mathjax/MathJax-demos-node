@@ -1,4 +1,4 @@
-#! /usr/bin/env -S node -r esm
+#! /usr/bin/env node
 
 /*************************************************************************
  *
@@ -26,12 +26,17 @@
 //
 //  Load the packages needed for MathJax
 //
-const TeX = require('mathjax-full/js/input/tex.js').TeX;
-const HTMLDocument = require('mathjax-full/js/handlers/html/HTMLDocument.js').HTMLDocument;
-const liteAdaptor = require('mathjax-full/js/adaptors/liteAdaptor.js').liteAdaptor;
-const STATE = require('mathjax-full/js/core/MathItem.js').STATE;
+const {TeX} = require('mathjax-full/js/input/tex.js');
+const {HTMLDocument} = require('mathjax-full/js/handlers/html/HTMLDocument.js');
+const {liteAdaptor} = require('mathjax-full/js/adaptors/liteAdaptor.js');
+const {STATE} = require('mathjax-full/js/core/MathItem.js');
 
-const AllPackages = require('mathjax-full/js/input/tex/AllPackages.js').AllPackages;
+const {AllPackages} = require('mathjax-full/js/input/tex/AllPackages.js');
+
+//
+//  Busproofs requires an output jax, which we aren't using
+//
+const packages = AllPackages.filter((name) => name !== 'bussproofs');
 
 //
 //  Get the command-line arguments
@@ -45,7 +50,7 @@ var argv = require('yargs')
             describe: "process as inline math"
         },
         packages: {
-            default: AllPackages.sort().join(', '),
+            default: packages.sort().join(', '),
             describe: 'the packages to use, e.g. "base, ams"'
         }
     })
@@ -64,8 +69,8 @@ const html = new HTMLDocument('', liteAdaptor(), {InputJax: tex});
 //
 //  Create a MathML serializer
 //
-const MmlVisitor = require('mathjax-full/js/core/MmlTree/SerializedMmlVisitor.js').SerializedMmlVisitor;
-const visitor = new MmlVisitor();
+const {SerializedMmlVisitor} = require('mathjax-full/js/core/MmlTree/SerializedMmlVisitor.js');
+const visitor = new SerializedMmlVisitor();
 const toMathML = (node => visitor.visitTree(node, html));
 
 //

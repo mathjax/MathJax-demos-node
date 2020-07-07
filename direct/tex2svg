@@ -1,4 +1,4 @@
-#! /usr/bin/env -S node -r esm
+#! /usr/bin/env node
 
 /*************************************************************************
  *
@@ -26,13 +26,14 @@
 //
 //  Load the packages needed for MathJax
 //
-const mathjax = require('mathjax-full/js/mathjax.js').mathjax;
-const TeX = require('mathjax-full/js/input/tex.js').TeX;
-const SVG = require('mathjax-full/js/output/svg.js').SVG;
-const liteAdaptor = require('mathjax-full/js/adaptors/liteAdaptor.js').liteAdaptor;
-const RegisterHTMLHandler = require('mathjax-full/js/handlers/html.js').RegisterHTMLHandler;
+const {mathjax} = require('mathjax-full/js/mathjax.js');
+const {TeX} = require('mathjax-full/js/input/tex.js');
+const {SVG} = require('mathjax-full/js/output/svg.js');
+const {liteAdaptor} = require('mathjax-full/js/adaptors/liteAdaptor.js');
+const {RegisterHTMLHandler} = require('mathjax-full/js/handlers/html.js');
+const {AssistiveMmlHandler} = require('mathjax-full/js/a11y/assistive-mml.js');
 
-const AllPackages = require('mathjax-full/js/input/tex/AllPackages.js').AllPackages;
+const {AllPackages} = require('mathjax-full/js/input/tex/AllPackages.js');
 
 //
 //  Get the command-line arguments
@@ -69,6 +70,11 @@ var argv = require('yargs')
             boolean: true,
             default: true,
             describe: 'whether to use a local font cache or not'
+        },
+        assistiveMml: {
+            boolean: true,
+            default: false,
+            describe: 'whether to include assistive MathML output'
         }
     })
     .argv;
@@ -77,7 +83,8 @@ var argv = require('yargs')
 //  Create DOM adaptor and register it for HTML documents
 //
 const adaptor = liteAdaptor();
-RegisterHTMLHandler(adaptor);
+const handler = RegisterHTMLHandler(adaptor);
+if (argv.assistiveMml) AssistiveMmlHandler(handler);
 
 //
 //  Create input and output jax and a document using them on the content from the HTML file

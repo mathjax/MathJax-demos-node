@@ -1,4 +1,4 @@
-#! /usr/bin/env -S node -r esm
+#! /usr/bin/env node
 
 /*************************************************************************
  *
@@ -26,11 +26,14 @@
 //
 //  Load the packages needed for MathJax
 //
-const mathjax = require('mathjax-full/js/mathjax.js').mathjax;
-const MathML = require('mathjax-full/js/input/mathml.js').MathML;
-const CHTML = require('mathjax-full/js/output/chtml.js').CHTML;
-const liteAdaptor = require('mathjax-full/js/adaptors/liteAdaptor.js').liteAdaptor;
-const RegisterHTMLHandler = require('mathjax-full/js/handlers/html.js').RegisterHTMLHandler;
+const {mathjax} = require('mathjax-full/js/mathjax.js');
+const {MathML} = require('mathjax-full/js/input/mathml.js');
+const {CHTML} = require('mathjax-full/js/output/chtml.js');
+const {liteAdaptor} = require('mathjax-full/js/adaptors/liteAdaptor.js');
+const {RegisterHTMLHandler} = require('mathjax-full/js/handlers/html.js');
+const {AssistiveMmlHandler} = require('mathjax-full/js/a11y/assistive-mml.js');
+
+require('mathjax-full/js/util/entities/all.js');
 
 //
 //  Get the command-line arguments
@@ -63,7 +66,7 @@ const htmlfile = require('fs').readFileSync(argv._[0], 'utf8');
 //  Create DOM adaptor and register it for HTML documents
 //
 const adaptor = liteAdaptor({fontSize: argv.em});
-RegisterHTMLHandler(adaptor);
+AssistiveMmlHandler(RegisterHTMLHandler(adaptor));
 
 //
 //  Create input and output jax and a document using them on the content from the HTML file
@@ -80,4 +83,5 @@ html.render();
 //
 //  Output the resulting HTML
 //
+console.log(adaptor.doctype(html.document));
 console.log(adaptor.outerHTML(adaptor.root(html.document)));

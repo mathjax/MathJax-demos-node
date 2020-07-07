@@ -24,6 +24,16 @@
  */
 
 //
+//  Load the packages needed for MathJax
+//
+const {mathjax} = require('mathjax-full/js/mathjax.js');
+const {MathML} = require('mathjax-full/js/input/mathml.js');
+const {CHTML} = require('mathjax-full/js/output/chtml.js');
+const {liteAdaptor} = require('mathjax-full/js/adaptors/liteAdaptor.js');
+const {RegisterHTMLHandler} = require('mathjax-full/js/handlers/html.js');
+const {AssistiveMmlHandler} = require('mathjax-full/js/a11y/assistive-mml.js');
+
+//
 //  Get the command-line arguments
 //
 var argv = require('yargs')
@@ -49,24 +59,21 @@ var argv = require('yargs')
         fontURL: {
             default: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.0.0/es5/output/chtml/fonts/woff-v2',
             describe: 'the URL to use for web fonts'
+        },
+        assistiveMml: {
+            boolean: true,
+            default: false,
+            describe: 'whether to include assistive MathML output'
         }
     })
     .argv;
 
 //
-//  Load the packages needed for MathJax
-//
-const mathjax = require('mathjax-full/js/mathjax.js').mathjax;
-const MathML = require('mathjax-full/js/input/mathml.js').MathML;
-const CHTML = require('mathjax-full/js/output/chtml.js').CHTML;
-const liteAdaptor = require('mathjax-full/js/adaptors/liteAdaptor.js').liteAdaptor;
-const RegisterHTMLHandler = require('mathjax-full/js/handlers/html.js').RegisterHTMLHandler;
-
-//
 //  Create DOM adaptor and register it for HTML documents
 //
 const adaptor = liteAdaptor({fontSize: argv.em});
-RegisterHTMLHandler(adaptor);
+const handler = RegisterHTMLHandler(adaptor);
+if (argv.assistiveMml) AssistiveMmlHandler(handler);
 
 //
 //  Create input and output jax and a document using them on the content from the HTML file

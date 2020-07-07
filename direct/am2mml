@@ -1,4 +1,4 @@
-#! /usr/bin/env -S node -r esm
+#! /usr/bin/env node
 
 /*************************************************************************
  *
@@ -26,10 +26,10 @@
 //
 //  Load the packages needed for MathJax
 //
-const AsciiMath = require('mathjax-full/js/input/asciimath.js').AsciiMath;
-const HTMLDocument = require('mathjax-full/js/handlers/html/HTMLDocument.js').HTMLDocument;
-const liteAdaptor = require('mathjax-full/js/adaptors/liteAdaptor.js').liteAdaptor;
-const STATE = require('mathjax-full/js/core/MathItem.js').STATE;
+const {AsciiMath} = require('mathjax-full/js/input/asciimath.js');
+const {HTMLDocument} = require('mathjax-full/js/handlers/html/HTMLDocument.js');
+const {liteAdaptor} = require('mathjax-full/js/adaptors/liteAdaptor.js');
+const {STATE} = require('mathjax-full/js/core/MathItem.js');
 
 //
 //  Get the command-line arguments
@@ -52,8 +52,8 @@ const html = new HTMLDocument('', liteAdaptor(), {InputJax: asciimath});
 //
 //  Create a MathML serializer
 //
-const MmlVisitor = require('mathjax-full/js/core/MmlTree/SerializedMmlVisitor.js').SerializedMmlVisitor;
-const visitor = new MmlVisitor();
+const {SerializedMmlVisitor} = require('mathjax-full/js/core/MmlTree/SerializedMmlVisitor.js');
+const visitor = new SerializedMmlVisitor();
 const toMathML = (node => visitor.visitTree(node, html));
 
 //

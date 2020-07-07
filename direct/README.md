@@ -12,29 +12,31 @@ All the examples in this directory consist of four main parts:
 These parts are described below using the `tex2chtml` command as an example.  It loads the following MathJax values:
 
 ```js
-const mathjax = require('mathjax-full/js/mathjax.js').mathjax;
-const TeX = require('mathjax-full/js/input/tex.js').TeX;
-const CHTML = require('mathjax-full/js/output/chtml.js').CHTML;
-const liteAdaptor = require('mathjax-full/js/adaptors/liteAdaptor.js').liteAdaptor;
-const RegisterHTMLHandler = require('mathjax-full/js/handlers/html.js').RegisterHTMLHandler;
+const {mathjax} = require('mathjax-full/js/mathjax.js');
+const {TeX} = require('mathjax-full/js/input/tex.js');
+const {CHTML} = require('mathjax-full/js/output/chtml.js');
+const {liteAdaptor} = require('mathjax-full/js/adaptors/liteAdaptor.js');
+const {RegisterHTMLHandler} = require('mathjax-full/js/handlers/html.js');
+const {AssistiveMmlHandler} = require('mathjax-full/js/a11y/assistive-mml.js');
 
-const AllPackages = require('mathjax-full/js/input/tex/AllPackages.js').AllPackages;
+const {AllPackages} = require('mathjax-full/js/input/tex/AllPackages.js');
 ```
 
-The `TeX` and `CHTML` objects are the input and output jax class constructors, the `liteAdaptor` is the constructor for the liteDOM adaptor, and `RegisterHTMLHandler` is a function used to tell MathJax that we want to work with HTML documents (using a particular DOM adaptor).  Finally, `AllPackages` is an array of the package names to use to initialize the TeX input jax; it includes all the available TeX packages except `autoload` and `require` (which rely on the component system to operate), and `physics` and `colorV2`, which have been loaded, but aren't included in the package array by default since `physics` redefines many standard macros and `color` is used rather than `colorV2` for the `\color` macro.  You can add `'physics'` to the array if you want to include it yourself.
+The `TeX` and `CHTML` objects are the input and output jax class constructors, the `liteAdaptor` is the constructor for the liteDOM adaptor, `RegisterHTMLHandler` is a function used to tell MathJax that we want to work with HTML documents (using a particular DOM adaptor), and `AssistiveMmlHandler` is a function to add the assistive-MathML functionality to the registered handler.  Finally, `AllPackages` is an array of the package names to use to initialize the TeX input jax; it includes all the available TeX packages except `autoload` and `require` (which rely on the component system to operate), and `physics` and `colorv2`, which have been loaded, but aren't included in the package array by default since `physics` redefines many standard macros and `color` is used rather than `colorv2` for the `\color` macro.  You can add `'physics'` to the array if you want to include it yourself.
 
 Next we create the needed MathJax objects:
 
 ```js
 const adaptor = liteAdaptor();
-RegisterHTMLHandler(adaptor);
+const handler = RegisterHTMLHandler(adaptor);
+if (argv.assistiveMml) AssistiveMmlHandler(handler);
 
 const tex = new TeX({packages: argv.packages.split(/\s*,\s*/)});
 const chtml = new CHTML({fontURL: argv.fontURL});
 const html = mathjax.document('', {InputJax: tex, OutputJax: chtml});
 ```
 
-Here we create the `liteDOM` adaptor and use it to tell MathJax that we will use HTML documents with the `liteDOM` implementation of the DOM.  Then we create the input and output jax, and create an empty document (based on the `liteDOM`) with those input and output jax.
+Here we create the `liteDOM` adaptor and use it to tell MathJax that we will use HTML documents with the `liteDOM` implementation of the DOM.  We extend the handler to include the assistive-MathML support, if requested on the command line.  Then we create the input and output jax, and create an empty document (based on the `liteDOM`) with those input and output jax.
 
 Finally, we do the conversion:
 
