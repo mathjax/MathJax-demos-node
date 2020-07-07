@@ -24,15 +24,17 @@ All three groups include examples of conversion from the various input formats t
 * `mml2svg-page`
 * `am2chtml-page`
 
-The first four convert an expression from either a TeX or MathML string (its first argument) to a CommonHTML, SVG, or MathML string.  The ones ending in `-page` take an HTML file and convert the math in it from the given input format to the specified output format and output the modified page.
+The first seven convert an expression from either a TeX, MathML, or AsciiMath string (given as its first argument) to a CommonHTML, SVG, or MathML string.  The ones ending in `-page` take an HTML file and convert the math in it from the given input format to the specified output format and output the modified page.
 
 Use the `--help` option to get a list of all the possible options for each command.
 
-The three categories of commands are stored in the directories called [component](component), [preload](preload), and [direct](direct).  See those directories for additional information about the example files they contain.
+The three categories of commands are stored in the directories called [component](component), [simple](simple), [preload](preload), and [direct](direct).  Both the `component` and `simple` directories are examples of the component-based approach.  See any those directories for additional information about the example files they contain.
 
 There is also a directory [speech](speech) that give examples of converters that add speech strings to their results, which illustrate more sophisticated operations in MathJax.  This is described in more detail in that directory.
 
-Finally, the [custom-tex-extension](custom-tex-extension) directory contains an example of how to create your own custom TeX extension and load it as a component.  Again, see the directory for more details.
+The [custom-tex-extension](custom-tex-extension) directory contains an example of how to create your own custom TeX extension and load it as a component.  Again, see the directory for more details.
+
+The [puppeteer](puppeteer) directory contains an example of how to use the [Puppeteer](https://developers.google.com/web/tools/puppeteer) library to use a headless Chrome instance to do server-side conversion of mathematics using MathJax.  This is useful in situations where you are using characters that are not included in the main MathJax fonts, as Chrome will be able to measure the widths of these characters so that they can be displayed more reliably.
 
 ## Installation
 
