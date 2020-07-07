@@ -64,6 +64,11 @@ var argv = require('yargs')
             boolean: true,
             default: true,
             describe: 'whether to use a local font cache or not'
+        },
+        assistiveMml: {
+            boolean: true,
+            default: false,
+            describe: 'whether to include assistive MathML output'
         }
     })
     .argv;
@@ -72,6 +77,7 @@ var argv = require('yargs')
 //  Configure MathJax
 //
 MathJax = {
+    options: {enableAssistiveMml: argv.assistiveMml},
     tex: {packages: argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/)},
     svg: {fontCache: (argv.fontCache ? 'local' : 'none')},
     startup: {typeset: false}
@@ -87,6 +93,7 @@ require('mathjax-full/components/src/input/tex-base/tex-base.js');
 require('mathjax-full/components/src/input/tex/extensions/all-packages/all-packages.js');
 require('mathjax-full/components/src/output/svg/svg.js');
 require('mathjax-full/components/src/output/svg/fonts/tex/tex.js');
+require('mathjax-full/components/src/a11y/assistive-mml/assistive-mml.js');
 require('mathjax-full/components/src/startup/startup.js');
 
 //
@@ -98,7 +105,8 @@ MathJax.loader.preLoad(
     'input/tex-base',
     '[tex]/all-packages',
     'output/svg',
-    'output/svg/fonts/tex'
+    'output/svg/fonts/tex',
+    'a11y/assistive-mml'
 );
 
 //

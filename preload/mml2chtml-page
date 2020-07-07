@@ -41,6 +41,11 @@ var argv = require('yargs')
         fontURL: {
             default: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.0.0/es5/output/chtml/fonts/woff-v2',
             describe: 'the URL to use for web fonts'
+        },
+        assistiveMml: {
+            boolean: true,
+            default: false,
+            describe: 'whether to include assistive MathML output'
         }
     })
     .argv;
@@ -79,6 +84,7 @@ require('mathjax-full/components/src/adaptors/liteDOM/liteDOM.js');
 require('mathjax-full/components/src/input/mml/mml.js');
 require('mathjax-full/components/src/output/chtml/chtml.js');
 require('mathjax-full/components/src/output/chtml/fonts/tex/tex.js');
+require('mathjax-full/components/src/a11y/assistive-mml/assistive-mml.js');
 require('mathjax-full/components/src/startup/startup.js');
 
 //
@@ -89,7 +95,8 @@ MathJax.loader.preLoad(
     'adaptors/liteDOM',
     'input/mml',
     'output/chtml',
-    'output/chtml/fonts/tex'
+    'output/chtml/fonts/tex',
+    'a11y/assistive-mml'
 );
 
 //

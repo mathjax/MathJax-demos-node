@@ -79,6 +79,7 @@ require('mathjax-full/components/src/adaptors/liteDOM/liteDOM.js');
 require('mathjax-full/components/src/input/asciimath/asciimath.js');
 require('mathjax-full/components/src/output/chtml/chtml.js');
 require('mathjax-full/components/src/output/chtml/fonts/tex/tex.js');
+require('mathjax-full/components/src/a11y/assistive-mml/assistive-mml.js');
 require('mathjax-full/components/src/startup/startup.js');
 
 //
@@ -89,7 +90,8 @@ MathJax.loader.preLoad(
     'adaptors/liteDOM',
     'input/asciimath',
     'output/chtml',
-    'output/chtml/fonts/tex'
+    'output/chtml/fonts/tex',
+    'a11y/assistive-mml'
 );
 
 //

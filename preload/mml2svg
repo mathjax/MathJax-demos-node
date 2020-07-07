@@ -55,6 +55,11 @@ var argv = require('yargs')
             boolean: true,
             default: true,
             describe: 'whether to use a local font cache or not'
+        },
+        assistiveMml: {
+            boolean: true,
+            default: false,
+            describe: 'whether to include assistive MathML output'
         }
     })
     .argv;
@@ -63,6 +68,7 @@ var argv = require('yargs')
 //  Configure MathJax
 //
 MathJax = {
+    options: {enableAssistiveMml: argv.assistiveMml},
     svg: {fontCache: (argv.fontCache ? 'local' : 'none')},
     startup: {typeset: false}
 };

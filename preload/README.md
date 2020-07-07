@@ -13,6 +13,7 @@ These parts are described below using the `tex2chtml` command as an example.  Th
 
 ```js
 MathJax = {
+    options: {enableAssistiveMml: argv.assistiveMml},
     tex: {packages: argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/)},
     chtml: {fontURL: argv.fontURL},
     startup: {typeset: false}
@@ -28,6 +29,7 @@ require('mathjax-full/components/src/input/tex-base/tex-base.js');
 require('mathjax-full/components/src/input/tex/extensions/all-packages/all-packages.js');
 require('mathjax-full/components/src/output/chtml/chtml.js');
 require('mathjax-full/components/src/output/chtml/fonts/tex/tex.js');
+require('mathjax-full/components/src/a11y/assistive-mml/assistive-mml.js');
 require('mathjax-full/components/src/startup/startup.js');
 
 //
@@ -39,11 +41,12 @@ MathJax.loader.preLoad(
     'input/tex-base',
     '[tex]/all-packages',
     'output/chtml',
-    'output/chtml/fonts/tex'
+    'output/chtml/fonts/tex',
+    'a11y/assistive-mml'
 );
 ```
 
-The `MathJax` object simply configures the `tex`, `chtml`, and startup modules, and then the various components that we want to use are loaded.  The first `require()` statement is important in that it initializes the startup module so that the other modules can properly hook into it.  The `core` module should be loaded next, as it is needed by all the other modules.  The `adaptors/liteDOM` is needed since we don't have a browser DOM to work with.  We load `tex-base` rather than `tex`, since `all-packages` includes the other packages and there is no need to load duplicate code.  We load the `chtml` output component, and the `chtml/fonts/tex` component so that we have the font data as well.  Finally, we load the `startup` component (the first load was just its library).
+The `MathJax` object simply configures the document, `tex`, `chtml`, and startup modules, and then the various components that we want to use are loaded.  The first `require()` statement is important in that it initializes the startup module so that the other modules can properly hook into it.  The `core` module should be loaded next, as it is needed by all the other modules.  The `adaptors/liteDOM` is needed since we don't have a browser DOM to work with.  We load `tex-base` rather than `tex`, since `all-packages` includes the other packages and there is no need to load duplicate code.  We load the `chtml` output component, and the `chtml/fonts/tex` component so that we have the font data as well.  The `a11y/assistive-mml` component is loaded to provide hidden MathML for accessibility.  Finally, we load the `startup` component (the first load was just its library).
 
 Once the files are loaded and MathJax is told about them, we tell the startup module to initialize itself:
 
