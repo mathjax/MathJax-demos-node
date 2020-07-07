@@ -86,33 +86,19 @@ MathJax = {
         require: require,
         load: ['adaptors/liteDOM', 'a11y/semantic-enrich']
     },
-    tex: {packages: argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/)},
-    chtml: {fontURL: argv.fontURL},
+    tex: {
+        packages: argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/)
+    },
+    chtml: {
+        fontURL: argv.fontURL
+    },
     options: {
+        enableAssistiveMml: false,
         enrichSpeech: argv.speech,
         renderActions: require('./action.js').speechAction
     },
     startup: {
-        typeset: false,
-        pageReady: () => {
-            MathJax.tex2chtmlPromise(argv._[0] || '', {
-                display: !argv.inline,
-                em: argv.em,
-                ex: argv.ex,
-                containerWidth: argv.width
-            }).then(node => {
-                const adaptor = MathJax.startup.adaptor;
-                //
-                //  If the --css option was specified, output the CSS,
-                //  Otherwise, output the typeset math as HTML
-                //
-                if (argv.css) {
-                    console.log(adaptor.textContent(MathJax.chtmlStylesheet()));
-                } else {
-                    console.log(adaptor.outerHTML(node));
-                };
-            }).catch(err => console.log(err));
-        }
+        typeset: false
     }
 }
 
@@ -121,3 +107,26 @@ MathJax = {
 //
 require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/tex-chtml') + '/tex-chtml.js');
 
+
+//
+//  Wait for MathJax to start up, and then typeset the math
+//
+MathJax.startup.promise.then(() => {
+    MathJax.tex2chtmlPromise(argv._[0] || '', {
+        display: !argv.inline,
+        em: argv.em,
+        ex: argv.ex,
+        containerWidth: argv.width
+    }).then((node) => {
+        const adaptor = MathJax.startup.adaptor;
+        //
+        //  If the --css option was specified, output the CSS,
+        //  Otherwise, output the typeset math as HTML
+        //
+        if (argv.css) {
+            console.log(adaptor.textContent(MathJax.chtmlStylesheet()));
+        } else {
+            console.log(adaptor.outerHTML(node));
+        };
+    });
+}).catch(err => console.log(err));

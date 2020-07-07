@@ -1,20 +1,20 @@
 require('mathjax-full/js/util/asyncLoad/node.js');
 require('mathjax-full/js/a11y/semantic-enrich.js');
-const STATE = require('mathjax-full/js/core/MathItem.js').STATE;
+const {STATE} = require('mathjax-full/js/core/MathItem.js');
 
 //
 //  Remove the data-semantic-* attributes other than data-semantic-speech
 //
 function removeSemanticData(math) {
-    math.root.walkTree(node => {
-        const attributes = node.attributes.getAllAttributes();
-        delete attributes.xmlns;    // some internal nodes get this attribute for some reason
-        for (const name of Object.keys(attributes)) {
-            if (name.substr(0, 14) === 'data-semantic-' && name !== 'data-semantic-speech') {
-                delete attributes[name];
-            }
-        }
-    });
+  math.root.walkTree(node => {
+    const attributes = node.attributes.getAllAttributes();
+    delete attributes.xmlns;    // some internal nodes get this attribute for some reason
+    for (const name of Object.keys(attributes)) {
+      if (name.substr(0, 14) === 'data-semantic-' && name !== 'data-semantic-speech') {
+        delete attributes[name];
+      }
+    }
+  });
 }
 
 //
@@ -24,15 +24,15 @@ function removeSemanticData(math) {
 //    The second is for when a MathItem's render(), rerender() or convert() method is called.
 //
 exports.speechAction = {
-    simplfy: [
-        STATE.ENRICHED + 1,
-        (doc) => {
-            for (const math of doc.math) {
-                removeSemanticData(math);
-            }
-        },
-        (math, doc) => {
-            removeSemanticData(math);
-        }
-    ]
+  simplfy: [
+    STATE.ENRICHED + 1,
+    (doc) => {
+      for (const math of doc.math) {
+        removeSemanticData(math);
+      }
+    },
+    (math, doc) => {
+      removeSemanticData(math);
+    }
+  ]
 };
