@@ -28,24 +28,28 @@ The first seven convert an expression from either a TeX, MathML, or AsciiMath st
 
 Use the `--help` option to get a list of all the possible options for each command.
 
-The three categories of commands are stored in the directories called [component](component), [simple](simple), [preload](preload), and [direct](direct).  Both the `component` and `simple` directories are examples of the component-based approach.  See any those directories for additional information about the example files they contain.
+The three categories of commands are stored in the directories called [`component`](component), [`simple`](simple), [`preload`](preload), and [`direct`](direct).  Both the `component` and `simple` directories are examples of the component-based approach, with the `component` directory containing versions that mirror the approach needed when MathJax is used in web pages, and the `simple` directory containing examples that take advantage of some simplifications available in node.  Each of those directories contain additional information about the example files they contain.
 
-There is also a directory [speech](speech) that give examples of converters that add speech strings to their results, which illustrate more sophisticated operations in MathJax.  This is described in more detail in that directory.
+There is also a directory [`speech`](speech) that give examples of converters that add speech strings to their results, which illustrate more sophisticated operations in MathJax.  This is described in more detail in that directory.
 
-The [custom-tex-extension](custom-tex-extension) directory contains an example of how to create your own custom TeX extension and load it as a component.  Again, see the directory for more details.
+The [`custom-tex-extension`](custom-tex-extension) directory contains an example of how to create your own custom TeX extension and load it as a component.  Again, see the directory for more details.
 
-The [puppeteer](puppeteer) directory contains an example of how to use the [Puppeteer](https://developers.google.com/web/tools/puppeteer) library to use a headless Chrome instance to do server-side conversion of mathematics using MathJax.  This is useful in situations where you are using characters that are not included in the main MathJax fonts, as Chrome will be able to measure the widths of these characters so that they can be displayed more reliably.
+The [`puppeteer`](puppeteer) directory contains an example of how to use the [Puppeteer](https://developers.google.com/web/tools/puppeteer) library to use a headless Chrome instance to do server-side conversion of mathematics using MathJax.  This is useful in situations where you are using characters that are not included in the main MathJax fonts, as Chrome will be able to measure the widths of these characters so that they can be displayed more reliably.
 
 ## Installation
 
 In order to try out these examples, clone this repository, enter the directory, and install the dependencies:
 
-    git clone https://github.com/mathjax/MathJax-demos-node.git MathJax-demos-node
-    cd MathJax-demos-node
-    npm install
+``` bash
+git clone https://github.com/mathjax/MathJax-demos-node.git MathJax-demos-node
+cd MathJax-demos-node
+npm install
+```
 
 The examples should be executable files that you can run.  On non-unix systems, you may need to call
 
-    node -r esm <example-name>
+``` bash
+node -r esm <example-name>
+```
 
-where `<example-name>` is the name of the example.  Some examples take an argument (like a TeX string) that follows the `<example-name>` above.
+where `<example-name>` is the name of the example file.  Some examples take an argument (like a TeX string) that follows the `<example-name>` above.
