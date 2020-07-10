@@ -1,0 +1,87 @@
+#! /usr/bin/env node
+
+/*************************************************************************
+ *
+ *  jsdom/tex2svg-page
+ *
+ *  Uses MathJax v3 to convert all TeX in an HTML document using jsdom.
+ *
+ * ----------------------------------------------------------------------
+ *
+ *  Copyright (c) 2020 The MathJax Consortium
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+//
+//  Load the packages needed for MathJax
+//
+const {mathjax} = require('mathjax-full/js/mathjax.js');
+const {TeX} = require('mathjax-full/js/input/tex.js');
+const {SVG} = require('mathjax-full/js/output/svg.js');
+const {jsdomAdaptor} = require('mathjax-full/js/adaptors/jsdomAdaptor.js');
+const {RegisterHTMLHandler} = require('mathjax-full/js/handlers/html.js');
+const {AssistiveMmlHandler} = require('mathjax-full/js/a11y/assistive-mml.js');
+
+const {AllPackages} = require('mathjax-full/js/input/tex/AllPackages.js');
+
+const {JSDOM} = require('jsdom');
+
+require('mathjax-full/js/util/entities/all.js');
+
+//
+//  Get the command-line arguments
+//
+const argv = require('yargs')
+  .demand(1).strict()
+  .usage('$0 [options] file.html > converted.html')
+  .options({
+     packages: {
+       default: AllPackages.sort().join(', '),
+       describe: 'the packages to use, e.g. "base, ams"'
+     },
+    fontCache: {
+      default: 'global',
+      describe: 'cache type: local, global, none'
+    }
+  })
+  .argv;
+
+//
+//  Read the HTML file
+//
+const htmlfile = require('fs').readFileSync(argv._[0], 'utf8');
+
+//
+//  Create DOM adaptor and register it for HTML documents
+//
+const adaptor = jsdomAdaptor(JSDOM);
+AssistiveMmlHandler(RegisterHTMLHandler(adaptor));
+
+//
+//  Create input and output jax and a document using them on the content from the HTML file
+//
+const tex = new TeX({packages: argv.packages.split(/\s*,\s*/)});
+const svg = new SVG({fontCache: argv.fontCache});
+const html = mathjax.document(htmlfile, {InputJax: tex, OutputJax: svg});
+
+//
+//  Typeset the document
+//
+html.render();
+
+//
+//  Output the resulting HTML
+//
+console.log(adaptor.doctype(html.document));
+console.log(adaptor.outerHTML(adaptor.root(html.document)));
