@@ -1,8 +1,8 @@
-#! /usr/bin/env -S node
+#! /usr/bin/env node
 
 /*************************************************************************
  *
- *  puppeteer/mathjax-puppeteer.js
+ *  puppeteer/tex2svg
  *
  *  Uses MathJax v3 to convert a TeX string to an SVG string
  *  inside a headless Chrome via puppeteer.
@@ -28,6 +28,9 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
 
+//
+//  The default packages to include
+//
 const PACKAGES = 'base, ams, newcommand, autoload, require';
 
 //
@@ -61,7 +64,7 @@ var argv = require('yargs')
 //
 // HTML shell file (need a file:// URL so we can load other files)
 //
-const html = 'file://' + path.resolve(__dirname, 'mathjax.html');
+const html = 'file://' + path.resolve(__dirname, 'puppeteer.html');
 
 //
 //  Path to MathJax root, and the component to load
@@ -82,24 +85,24 @@ const display = {display: !argv.inline};
 //
 //  The configuration to use for MathJax
 //
-const config = `
-MathJax = {
-  tex: {packages: ['${argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/).join("', '")}']},
+const config = 'MathJax = ' + JSON.stringify({
+  tex: {
+    packages: argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/)
+  },
   svg: {
-    mtextFont: '${argv.textfont}',
-    merrorFont: '${argv.textfont}',
-    fontCache: '${argv.fontCache ? 'local' : 'none'}'
+    mtextFont: argv.textfont,
+    merrorFont: argv.textfont,
+    fontCache: (argv.fontCache ? 'local' : 'none')
   },
   loader: {
     paths: {
-      mathjax: 'file://${root}'
+      mathjax: `file://${root}`
     }
   },
   startup: {
     typeset: false
   }
-}
-`;
+});
 
 //
 //  Open the HTML page above in Puppeteer and use MathJax in that page
@@ -125,5 +128,5 @@ MathJax = {
     throw e;                                      //   throw the error again (handled below)
   });
 })().catch((e) => {                // If the process produces an error
-  console.log(e.message);          //   reoport the error
+  console.error(e.message);        //   reoport the error
 });
