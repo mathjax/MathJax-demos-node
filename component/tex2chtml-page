@@ -48,7 +48,7 @@ var argv = require('yargs')
             describe: 'the packages to use, e.g. "base, ams"; use "*" to represent the default packages, e.g, "*, bbox"'
         },
         fontURL: {
-            default: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.0.0/es5/output/chtml/fonts/woff-v2',
+            default: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2',
             describe: 'the URL to use for web fonts'
         },
         dist: {

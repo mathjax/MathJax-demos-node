@@ -67,7 +67,7 @@ var argv = require('yargs')
             describe: 'output the required CSS rather than the HTML itself'
         },
         fontURL: {
-            default: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.0.0/es5/output/chtml/fonts/woff-v2',
+            default: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2',
             describe: 'the URL to use for web fonts'
         },
         assistiveMml: {
