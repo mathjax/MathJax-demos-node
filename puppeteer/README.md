@@ -100,7 +100,7 @@ Note that if you have many expressions to process, you could leave the browser r
 
 ## Installation
 
-In order to try out this example you must install its dependencies.  Since the code relies on Puppeteer, that needs to be installed, so this directory contains a separate `package.json` file, an you should do the following:
+In order to try out this example you must install its dependencies.  Since the code relies on Puppeteer, that needs to be installed, so this directory contains a separate `package.json` file, and you should do the following:
 
 ``` bash
 cd MathJax-demos-node/puppeteer
