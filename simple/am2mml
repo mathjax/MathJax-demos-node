@@ -60,7 +60,7 @@ require('mathjax-full').init({
     //
     loader: {
         source: (argv.dist ? {} : require('mathjax-full/components/src/source.js').source),
-        load: ['input/asciimath', 'adaptors/liteDom']
+        load: ['input/asciimath', 'adaptors/liteDOM']
     }
 }).then((MathJax) => {
     //

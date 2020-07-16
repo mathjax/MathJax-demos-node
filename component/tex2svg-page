@@ -100,8 +100,6 @@ require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/tex-svg') + '/tex
 MathJax.startup.promise.then(() => {
     const adaptor = MathJax.startup.adaptor;
     const html = MathJax.startup.document;
-    MathJax.startup.promise.then(() => {
-        console.log(adaptor.doctype(html.document));
-        console.log(adaptor.outerHTML(adaptor.root(html.document)));
-    });
+    console.log(adaptor.doctype(html.document));
+    console.log(adaptor.outerHTML(adaptor.root(html.document)));
 }).catch(err => console.log(err));

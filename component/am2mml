@@ -59,7 +59,7 @@ MathJax = {
         paths: {mathjax: 'mathjax-full/es5'},
         source: (argv.dist ? {} : require('mathjax-full/components/src/source.js').source),
         require: require,
-        load: ['input/asciimath', 'adaptors/liteDom']
+        load: ['input/asciimath', 'adaptors/liteDOM']
     }
 }
 

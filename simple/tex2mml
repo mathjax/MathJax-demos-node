@@ -73,7 +73,7 @@ require('mathjax-full').init({
     //
     loader: {
         source: (argv.dist ? {} : require('mathjax-full/components/src/source.js').source),
-        load: ['input/tex-full', 'adaptors/liteDom']
+        load: ['input/tex-full', 'adaptors/liteDOM']
     },
     tex: {
         packages: argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/)
