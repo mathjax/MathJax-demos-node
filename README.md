@@ -20,6 +20,7 @@ All three groups include examples of conversion from the various input formats t
 * `am2mml`
 * `tex2chtml-page`
 * `tex2svg-page`
+* `tex2mml-page`
 * `mml2chtml-page`
 * `mml2svg-page`
 * `am2chtml-page`
