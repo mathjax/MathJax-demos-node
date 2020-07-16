@@ -2,7 +2,7 @@
 
 /*************************************************************************
  *
- *  component/tex2mml-page
+ *  simple/tex2mml-page
  *
  *  Uses MathJax v3 to convert all TeX in an HTML document to MathML.
  *
@@ -22,6 +22,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
 
 //
 //  The default TeX packages to use
@@ -67,13 +68,14 @@ function actionMML(math, doc) {
 }
 
 //
-//  Configure MathJax
+// Load MathJax and initialize MathJax and typeset the given math
 //
-MathJax = {
+require('mathjax-full').init({
+    //
+    //  The MathJax configuration
+    //
     loader: {
-        paths: {mathjax: 'mathjax-full/es5'},
         source: (argv.dist ? {} : require('mathjax-full/components/src/source.js').source),
-        require: require,
         load: ['input/tex-full', 'adaptors/liteDOM']
     },
     options: {
@@ -90,18 +92,7 @@ MathJax = {
     startup: {
         document: htmlfile
     }
-}
-
-//
-//  Load the MathJax startup module
-//
-require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/startup') + '/startup.js');
-
-//
-//  Wait for MathJax to start up, and then render the math.
-//  Then output the resulting HTML file.
-//
-MathJax.startup.promise.then(() => {
+}).then((MathJax) => {
     const adaptor = MathJax.startup.adaptor;
     const html = MathJax.startup.document;
     html.render();

@@ -2,7 +2,7 @@
 
 /*************************************************************************
  *
- *  component/tex2mml-page
+ *  preload/tex2mml-page
  *
  *  Uses MathJax v3 to convert all TeX in an HTML document to MathML.
  *
@@ -23,10 +23,11 @@
  *  limitations under the License.
  */
 
+
 //
 //  The default TeX packages to use
 //
-const PACKAGES = 'base, autoload, ams, newcommand, require';
+const PACKAGES = 'base, autoload, require, ams, newcommand';
 
 //
 //  Get the command-line arguments
@@ -42,11 +43,6 @@ var argv = require('yargs')
         packages: {
             default: PACKAGES,
             describe: 'the packages to use, e.g. "base, ams"; use "*" to represent the default packages, e.g, "*, bbox"'
-        },
-        dist: {
-            boolean: true,
-            default: false,
-            describe: 'true to use webpacked version, false to use MathJax source files'
         }
     })
     .argv;
@@ -70,19 +66,16 @@ function actionMML(math, doc) {
 //  Configure MathJax
 //
 MathJax = {
+    tex: {
+        packages: argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/)
+    },
     loader: {
-        paths: {mathjax: 'mathjax-full/es5'},
-        source: (argv.dist ? {} : require('mathjax-full/components/src/source.js').source),
-        require: require,
-        load: ['input/tex-full', 'adaptors/liteDOM']
+        require: require
     },
     options: {
         renderActions: {
           typeset: [150, (doc) => {for (const math of doc.math) actionMML(math, doc)}, actionMML]
         }
-    },
-    tex: {
-        packages: argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/)
     },
     'adaptors/liteDOM': {
         fontSize: argv.em
@@ -90,21 +83,40 @@ MathJax = {
     startup: {
         document: htmlfile
     }
-}
+};
 
 //
-//  Load the MathJax startup module
+//  Load all the needed components
 //
-require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/startup') + '/startup.js');
+require('mathjax-full/components/src/startup/lib/startup.js');
+require('mathjax-full/components/src/core/core.js');
+require('mathjax-full/components/src/adaptors/liteDOM/liteDOM.js');
+require('mathjax-full/components/src/input/tex-base/tex-base.js');
+require('mathjax-full/components/src/input/tex/extensions/all-packages/all-packages.js');
+require('mathjax-full/components/src/startup/startup.js');
 
 //
-//  Wait for MathJax to start up, and then render the math.
-//  Then output the resulting HTML file.
+//  Let MathJax know these are loaded
 //
-MathJax.startup.promise.then(() => {
-    const adaptor = MathJax.startup.adaptor;
-    const html = MathJax.startup.document;
-    html.render();
-    console.log(adaptor.doctype(html.document));
-    console.log(adaptor.outerHTML(adaptor.root(html.document)));
-}).catch(err => console.log(err));
+MathJax.loader.preLoad(
+    'core',
+    'adaptors/liteDOM',
+    'input/tex-base',
+    '[tex]/all-packages',
+    'startup'
+);
+
+//
+//  Create the MathJax methods for the input and output that is loaded
+//
+MathJax.config.startup.ready();
+
+//
+//  Render the math, then output the resulting HTML file.
+//
+const adaptor = MathJax.startup.adaptor;
+const html = MathJax.startup.document;
+
+html.render();
+console.log(adaptor.doctype(html.document));
+console.log(adaptor.outerHTML(adaptor.root(html.document)));
