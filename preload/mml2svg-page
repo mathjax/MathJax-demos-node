@@ -90,10 +90,23 @@ MathJax.loader.preLoad(
 MathJax.config.startup.ready();
 
 //
-//  Output the typeset page
+//  Typeset the document
 //
 MathJax.typeset();
 const adaptor = MathJax.startup.adaptor;
 const html = MathJax.startup.document;
+
+//
+//  If no math was found on the page, remove the stylesheet and font cache (if any)
+//
+if (html.math.toArray().length === 0) {
+  adaptor.remove(html.outputJax.svgStyles);
+  const cache = adaptor.elementById(adaptor.body(html.document), 'MJX-SVG-global-cache');
+  if (cache) adaptor.remove(cache);
+}
+
+//
+//  Output the resulting HTML
+//
 console.log(adaptor.doctype(html.document));
 console.log(adaptor.outerHTML(adaptor.root(html.document)));
