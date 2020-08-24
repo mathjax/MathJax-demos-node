@@ -81,6 +81,11 @@ const html = mathjax.document(htmlfile, {InputJax: asciimath, OutputJax: chtml})
 html.render();
 
 //
+//  If no math was found on the page, remove the stylesheet
+//
+if (html.math.toArray().length === 0) adaptor.remove(html.outputJax.chtmlStyles);
+
+//
 //  Output the resulting HTML
 //
 console.log(adaptor.doctype(html.document));
