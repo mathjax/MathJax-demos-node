@@ -1,5 +1,6 @@
 require('mathjax-full/js/util/asyncLoad/node.js');
 require('mathjax-full/js/a11y/semantic-enrich.js');
+require('mathjax-full/js/a11y/sre-node.js');
 const {STATE} = require('mathjax-full/js/core/MathItem.js');
 
 //
@@ -16,6 +17,26 @@ function removeSemanticData(math) {
     }
   });
 }
+
+
+const sreDefault = {
+    domain: 'mathspeak',
+    style: 'default'
+};
+
+
+// Configures SRE from key value pairs.
+exports.sreconfig = function(data) {
+    let config = {};
+    if (data) {
+        for (let i = 0, key; key = data[i]; i++) {
+            let value = data[++i];
+            config[key] = value || false;
+        }
+    }
+    sre.setupEngine(Object.assign({}, sreDefault, config));
+};
+
 
 //
 //  The renderActions needed to remove the data-semantic-attributes.
