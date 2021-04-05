@@ -36,46 +36,68 @@ const {AssistiveMmlHandler} = require('mathjax-full/js/a11y/assistive-mml.js');
 const {AllPackages} = require('mathjax-full/js/input/tex/AllPackages.js');
 
 //
+//  Minimal CSS needed for stand-alone image
+//
+const CSS = [
+  'svg a{fill:blue;stroke:blue}',
+  '[data-mml-node="merror"]>g{fill:red;stroke:red}',
+  '[data-mml-node="merror"]>rect[data-background]{fill:yellow;stroke:none}',
+  '[data-frame],[data-line]{stroke-width:70px;fill:none}',
+  '.mjx-dashed{stroke-dasharray:140}',
+  '.mjx-dotted{stroke-linecap:round;stroke-dasharray:0,140}',
+  'use[data-c]{stroke-width:3px}'
+].join('');
+
+//
 //  Get the command-line arguments
 //
 var argv = require('yargs')
     .demand(0).strict()
     .usage('$0 [options] "math" > file.svg')
     .options({
-        inline: {
-            boolean: true,
-            describe: "process as inline math"
-        },
-        em: {
-            default: 16,
-            describe: 'em-size in pixels'
-        },
-        ex: {
-            default: 8,
-            describe: 'ex-size in pixels'
-        },
-        width: {
-            default: 80 * 16,
-            describe: 'width of container in pixels'
-        },
-        packages: {
-            default: AllPackages.sort().join(', '),
-            describe: 'the packages to use, e.g. "base, ams"'
-        },
-        css: {
-            boolean: true,
-            describe: 'output the required CSS rather than the SVG itself'
-        },
-        fontCache: {
-            boolean: true,
-            default: true,
-            describe: 'whether to use a local font cache or not'
-        },
-        assistiveMml: {
-            boolean: true,
-            default: false,
-            describe: 'whether to include assistive MathML output'
-        }
+      inline: {
+        boolean: true,
+        describe: "process as inline math"
+      },
+      em: {
+        default: 16,
+        describe: 'em-size in pixels'
+      },
+      ex: {
+        default: 8,
+        describe: 'ex-size in pixels'
+      },
+      width: {
+        default: 80 * 16,
+        describe: 'width of container in pixels'
+      },
+      packages: {
+        default: AllPackages.sort().join(', '),
+        describe: 'the packages to use, e.g. "base, ams"'
+      },
+      styles: {
+        boolean: true,
+        default: true,
+        describe: 'include css styles for stand-alone image'
+      },
+      container: {
+        boolean: true,
+        describe: 'include <mjx-container> element'
+      },
+      css: {
+        boolean: true,
+        describe: 'output the required CSS rather than the SVG itself'
+      },
+      fontCache: {
+        boolean: true,
+        default: true,
+        describe: 'whether to use a local font cache or not'
+      },
+      assistiveMml: {
+        boolean: true,
+        default: false,
+        describe: 'whether to include assistive MathML output'
+      }
     })
     .argv;
 
@@ -97,10 +119,10 @@ const html = mathjax.document('', {InputJax: tex, OutputJax: svg});
 //  Typeset the math from the command line
 //
 const node = html.convert(argv._[0] || '', {
-    display: !argv.inline,
-    em: argv.em,
-    ex: argv.ex,
-    containerWidth: argv.width
+  display: !argv.inline,
+  em: argv.em,
+  ex: argv.ex,
+  containerWidth: argv.width
 });
 
 //
@@ -108,7 +130,8 @@ const node = html.convert(argv._[0] || '', {
 //  Otherwise, typeset the math and output the HTML
 //
 if (argv.css) {
-    console.log(adaptor.textContent(svg.styleSheet(html)));
+  console.log(adaptor.textContent(svg.styleSheet(html)));
 } else {
-    console.log(adaptor.outerHTML(node));
+  let html = (argv.container ? adaptor.outerHTML(node) : adaptor.innerHTML(node));
+  console.log(argv.styles ? html.replace(/<defs>/, `<defs><style>${CSS}</style>`) : html);
 }
