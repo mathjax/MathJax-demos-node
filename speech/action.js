@@ -40,7 +40,7 @@ exports.sreconfig = function(data) {
 
 //
 //  The renderActions needed to remove the data-semantic-attributes.
-//    STATE.ENRICHED is the priority of the enrichment, so this will rung just after enrichment.
+//    STATE.ENRICHED is the priority of the enrichment, so this will run just after enrichment.
 //    The first function is the one for when the document's render() method is called.
 //    The second is for when a MathItem's render(), rerender() or convert() method is called.
 //
