@@ -94,7 +94,7 @@ MathJax = {
     },
     options: {
         enableAssistiveMml: false,
-        enrichSpeech: argv.speech,
+        sre: {speech: argv.speech},
         renderActions: require('./action.js').speechAction
     },
     startup: {
