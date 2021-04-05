@@ -4,17 +4,17 @@
   "description": "Demos using MathJax v3 in node",
   "dependencies": {
     "esm": "^3.2.25",
-    "mathjax-full": "^3.1.0",
-    "yargs": "^15.4.0"
+    "mathjax-full": "^3.1.2",
+    "yargs": "^16.2.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.11.1",
-    "@babel/preset-env": "^7.11.0",
-    "babel-loader": "^8.1.0",
-    "mj-context-menu": "^0.5.4",
-    "terser-webpack-plugin": "^4.1.0",
-    "webpack": "^4.44.1",
-    "webpack-cli": "^3.3.12"
+    "@babel/core": "^7.13.14",
+    "@babel/preset-env": "^7.13.12",
+    "babel-loader": "^8.2.2",
+    "mj-context-menu": "^0.6.1",
+    "terser-webpack-plugin": "^5.1.1",
+    "webpack": "^5.30.0",
+    "webpack-cli": "^4.6.0"
   },
   "repository": {
     "type": "git",
