@@ -44,10 +44,6 @@ var argv = require('yargs')
             default: PACKAGES,
             describe: 'the packages to use, e.g. "base, ams"; use "*" to represent the default packages, e.g, "*, bbox"'
         },
-        speech: {
-            default: 'shallow',
-            describe: 'level of speech: deep, shallow, none'
-        },
         sre: {
             array: true,
             nargs: 2,
@@ -91,10 +87,11 @@ require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/startup') + '/sta
 //
 //  Wait for MathJax to start up, and then typeset the math
 //
-MathJax.startup.promise.then(() => {    MathJax.tex2mmlPromise(argv._[0] || '', {
-        display: !argv.inline,
-        em: argv.em,
-        ex: argv.ex,
-        containerWidth: argv.width
-}).then(mml => console.log(sre.toSpeech(mml)));
-}).catch(err => console.log(err));
+MathJax.startup.promise.then(() =>
+  MathJax.tex2mmlPromise(argv._[0] || '', {
+    display: !argv.inline,
+    em: argv.em,
+    ex: argv.ex,
+    containerWidth: argv.width
+  }).then(mml => console.log(sre.toSpeech(mml)))
+).catch(err => console.log(err));

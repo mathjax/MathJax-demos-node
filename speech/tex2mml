@@ -70,7 +70,7 @@ MathJax = {
         packages: argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/)
     },
     options: {
-        enrichSpeech: argv.speech,
+        sre: {speech: argv.speech},
         renderActions: require('./action.js').speechAction
     }
 }

@@ -60,7 +60,7 @@ npm install --production
 
 (If you wish to rebuild the jsdom adaptor component, then leave off the `--production` so that the developer dependencies will be isntalled.)
 
-The exampk files should be executables that you can run.  On non-unix systems, you may need to call
+The example files should be executables that you can run.  On non-unix systems, you may need to call
 
 ``` bash
 node -r esm <example-name>

@@ -30,6 +30,19 @@
 const PACKAGES = 'base, autoload, require, ams, newcommand';
 
 //
+//  Minimal CSS needed for stand-alone image
+//
+const CSS = [
+  'svg a{fill:blue;stroke:blue}',
+  '[data-mml-node="merror"]>g{fill:red;stroke:red}',
+  '[data-mml-node="merror"]>rect[data-background]{fill:yellow;stroke:none}',
+  '[data-frame],[data-line]{stroke-width:70px;fill:none}',
+  '.mjx-dashed{stroke-dasharray:140}',
+  '.mjx-dotted{stroke-linecap:round;stroke-dasharray:0,140}',
+  'use[data-c]{stroke-width:3px}'
+].join('');
+
+//
 //  Get the command-line arguments
 //
 var argv = require('yargs')
@@ -55,6 +68,15 @@ var argv = require('yargs')
         packages: {
             default: PACKAGES,
             describe: 'the packages to use, e.g. "base, ams"; use "*" to represent the default packages, e.g, "*, bbox"'
+        },
+        styles: {
+            boolean: true,
+            default: true,
+            describe: 'include css styles for stand-alone image'
+        },
+        container: {
+            boolean: true,
+            describe: 'include <mjx-container> element'
         },
         css: {
             boolean: true,
@@ -125,7 +147,8 @@ MathJax.startup.promise.then(() => {
         if (argv.css) {
             console.log(adaptor.textContent(MathJax.svgStylesheet()));
         } else {
-            console.log(adaptor.outerHTML(node));
+            let html = (argv.container ? adaptor.outerHTML(node) : adaptor.innerHTML(node));
+            console.log(argv.styles ? html.replace(/<defs>/, `<defs><style>${CSS}</style>`) : html);
         };
     });
 }).catch(err => console.log(err));
