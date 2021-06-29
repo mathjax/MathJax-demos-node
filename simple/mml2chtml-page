@@ -82,7 +82,7 @@ require('mathjax-full').init({
     //
     const adaptor = MathJax.startup.adaptor;
     const html = MathJax.startup.document;
-    if (html.math.toArray().length === 0) adaptor.remove(html.outputJax.chtmlStyles);
+    if (Array.from(html.math).length === 0) adaptor.remove(html.outputJax.chtmlStyles);
     console.log(adaptor.doctype(html.document));
     console.log(adaptor.outerHTML(adaptor.root(html.document)));
 }).catch(err => console.log(err));
