@@ -8,6 +8,7 @@ const {STATE} = require('mathjax-full/js/core/MathItem.js');
 //
 function removeSemanticData(math) {
   math.root.walkTree(node => {
+    if (!node.attributes) return;
     const attributes = node.attributes.getAllAttributes();
     delete attributes.xmlns;    // some internal nodes get this attribute for some reason
     for (const name of Object.keys(attributes)) {
