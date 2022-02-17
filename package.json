@@ -4,7 +4,7 @@
   "description": "Demos using MathJax v3 in node",
   "dependencies": {
     "esm": "^3.2.25",
-    "mathjax-full": "^3.2.0",
+    "mathjax-full": "git://github.com/mathjax/MathJax-src.git#build-tools",
     "yargs": "^17.0.1"
   },
   "devDependencies": {
@@ -14,6 +14,10 @@
     "terser-webpack-plugin": "^5.1.3",
     "webpack": "^5.39.1",
     "webpack-cli": "^4.7.2"
+  },
+  "scripts": {
+    "make-mathjax": "cd node_modules/mathjax-full && npm run -s compile && npm run -s make-components",
+    "make-mixin": "cd custom-mixin && npx tsc && ../node_modules/mathjax-full/components/bin/makeAll component"
   },
   "repository": {
     "type": "git",

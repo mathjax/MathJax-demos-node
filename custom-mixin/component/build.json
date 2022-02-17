@@ -1,0 +1,6 @@
+{
+  "js": "../js",
+  "global": "../../../node_modules/mathjax-full/js/components/global.js",
+  "component": "custom-mixin",
+  "targets": ["custom-mixin.ts"]
+}
