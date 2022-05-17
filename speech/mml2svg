@@ -127,6 +127,7 @@ const node = html.convert(argv._[0] || '', {
 if (argv.css) {
   console.log(adaptor.textContent(svg.styleSheet(html)));
 } else {
+  console.log(argv.container);
   let html = (argv.container ? adaptor.outerHTML(node) : adaptor.innerHTML(node));
   console.log(argv.styles ? html.replace(/<defs>/, `<defs><style>${CSS}</style>`) : html);
 }

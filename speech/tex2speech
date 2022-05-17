@@ -2,7 +2,7 @@
 
 /*************************************************************************
  *
- *  speech/tex2mml
+ *  speech/tex2speech
  *
  *  Uses MathJax v3 to convert a TeX string to a MathML string with speech.
  *
@@ -25,9 +25,21 @@
 
 
 //
+//  Load the packages needed for MathJax
+//
+const {mathjax} = require('mathjax-full/js/mathjax.js');
+const {TeX} = require('mathjax-full/js/input/tex.js');
+const {Sre} = require('mathjax-full/js/a11y/sre.js');
+const {liteAdaptor} = require('mathjax-full/js/adaptors/liteAdaptor.js');
+const {RegisterHTMLHandler} = require('mathjax-full/js/handlers/html.js');
+const {SerializedMmlVisitor} = require('mathjax-full/js/core/MmlTree/SerializedMmlVisitor.js');
+
+
+//
 //  The default TeX packages to use
 //
 const PACKAGES = 'base, autoload, require, ams, newcommand';
+
 
 //
 //  Get the command-line arguments
@@ -60,38 +72,48 @@ var argv = require('yargs')
 const action = require('./action.js');
 
 //
-// Pass additional arguments to SRE.
+//  Create DOM adaptor and register it for HTML documents
+//
+const adaptor = liteAdaptor();
+const handler = RegisterHTMLHandler(adaptor);
+
+//
+//  Create input jax only and a document
+//
+const tex = new TeX({packages: argv.packages.split(/\s*,\s*/)});
+const html = mathjax.document('', {InputJax: tex});
+
+//
+//  Typeset the math from the command line
+//
+const node = html.convert(argv._[0] || '', {
+  display: !argv.inline,
+  em: argv.em,
+  ex: argv.ex,
+  containerWidth: argv.width
+});
+
+//
+//  Create a visitor to serialize the node to Mml.
+//
+const visitor = new SerializedMmlVisitor();
+const mml = visitor.visitTree(node, html);
+
 // 
-action.sreconfig(argv.sre);
+//  Get feature vector for SRE setup. If necessary, compute the path to the
+//  locale JSON files explicitly.
+//
+const feature = action.dataPairs(argv.sre);
+feature.json = feature.json ? feature.json :
+  require.resolve('mathjax-full/es5/sre/mathmaps/base.json').replace(/\/base\.json$/, '');
 
 //
-//  Configure MathJax
+//  Run SRE, by first setting it up and then compute the speech string.
+// 
+//  Note, that after setting up the engine, we need to wait for it to be ready,
+//  so it has finished loading its rule files.
 //
-MathJax = {
-    loader: {
-        paths: {mathjax: 'mathjax-full/es5', sre: 'mathjax-full/js/a11y/sre-node'},
-        source: (argv.dist ? {} : require('mathjax-full/components/src/source.js').source),
-        require: require,
-        load: ['input/tex-full', 'adaptors/liteDOM']
-    },
-    tex: {
-        packages: argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/)
-    }
-}
-
-//
-//  Load the MathJax startup module
-//
-require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/startup') + '/startup.js');
-
-//
-//  Wait for MathJax to start up, and then typeset the math
-//
-MathJax.startup.promise.then(() =>
-  MathJax.tex2mmlPromise(argv._[0] || '', {
-    display: !argv.inline,
-    em: argv.em,
-    ex: argv.ex,
-    containerWidth: argv.width
-  }).then(mml => console.log(sre.toSpeech(mml)))
-).catch(err => console.log(err));
+Sre.setupEngine(feature)
+  .then(() => Sre.sreReady())
+  .then(() => console.log(Sre.toSpeech(mml)))
+  .catch(err => console.log(err));

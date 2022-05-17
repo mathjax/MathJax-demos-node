@@ -2,9 +2,9 @@
 
 /*************************************************************************
  *
- *  speech/tex2svg
+ *  component/tex2chtml-speech
  *
- *  Uses MathJax v3 to convert a TeX string to an SVG string with speech.
+ *  Uses MathJax v3 to convert a TeX string to an HTML string.
  *
  * ----------------------------------------------------------------------
  *
@@ -28,19 +28,6 @@
 //  The default TeX packages to use
 //
 const PACKAGES = 'base, autoload, require, ams, newcommand';
-
-//
-//  Minimal CSS needed for stand-alone image
-//
-const CSS = [
-  'svg a{fill:blue;stroke:blue}',
-  '[data-mml-node="merror"]>g{fill:red;stroke:red}',
-  '[data-mml-node="merror"]>rect[data-background]{fill:yellow;stroke:none}',
-  '[data-frame],[data-line]{stroke-width:70px;fill:none}',
-  '.mjx-dashed{stroke-dasharray:140}',
-  '.mjx-dotted{stroke-linecap:round;stroke-dasharray:0,140}',
-  'use[data-c]{stroke-width:3px}'
-].join('');
 
 //
 //  Get the command-line arguments
@@ -78,28 +65,18 @@ var argv = require('yargs')
             default: 'shallow',
             describe: 'level of speech: deep, shallow, none'
         },
-        fontCache: {
-            boolean: true,
-            default: true,
-            describe: 'whether to use a local font cache or not'
-        },
-        styles: {
-            boolean: true,
-            default: true,
-            describe: 'include css styles for stand-alone image'
-        },
-        container: {
-            boolean: true,
-            describe: 'include <mjx-container> element'
-        },
         css: {
             boolean: true,
             describe: 'output the required CSS rather than the HTML itself'
         },
+        fontURL: {
+            default: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2',
+            describe: 'the URL to use for web fonts'
+        },
         dist: {
             boolean: true,
             default: false,
-            describe: 'true to use webpacked version, false to use mathjax3 source files'
+            describe: 'true to use webpacked version, false to use MathJax source files'
         }
     })
     .argv;
@@ -110,22 +87,25 @@ const action = require('./action.js');
 //  Configure MathJax
 //
 MathJax = {
+    options: {
+      enableAssistiveMml: false,
+      enableEnrichment: true,
+      renderActions: action.speechAction,
+      sre: {
+        speech: argv.speech
+      }
+    },
     loader: {
         paths: {mathjax: 'mathjax-full/es5'},
         source: (argv.dist ? {} : require('mathjax-full/components/src/source.js').source),
         require: require,
-        load: ['adaptors/liteDOM', 'a11y/semantic-enrich']
+      load: ['adaptors/liteDOM', 'a11y/semantic-enrich']
     },
     tex: {
         packages: argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/)
     },
-    svg: {
-        fontCache: (argv.fontCache ? 'local' : 'none')
-    },
-    options: {
-        enableAssistiveMml: false,
-        sre: {speech: argv.speech},
-        renderActions: action.speechAction
+    chtml: {
+        fontURL: argv.fontURL
     },
     startup: {
         typeset: false
@@ -135,7 +115,7 @@ MathJax = {
 //
 //  Load the MathJax startup module
 //
-require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/tex-svg') + '/tex-svg.js');
+require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/tex-chtml-full-speech') + '/tex-chtml-full-speech.js');
 
 //
 // Filling the sre options from command line
@@ -146,7 +126,7 @@ action.sreconfig(argv.sre);
 //  Wait for MathJax to start up, and then typeset the math
 //
 MathJax.startup.promise.then(() => {
-    MathJax.tex2svgPromise(argv._[0] || '', {
+    MathJax.tex2chtmlPromise(argv._[0] || '', {
         display: !argv.inline,
         em: argv.em,
         ex: argv.ex,
@@ -155,13 +135,12 @@ MathJax.startup.promise.then(() => {
         const adaptor = MathJax.startup.adaptor;
         //
         //  If the --css option was specified, output the CSS,
-        //  Otherwise, output the typeset math as SVG
+        //  Otherwise, output the typeset math as HTML
         //
         if (argv.css) {
-            console.log(adaptor.textContent(MathJax.svgStylesheet()));
+            console.log(adaptor.textContent(MathJax.chtmlStylesheet()));
         } else {
-            let html = (argv.container ? adaptor.outerHTML(node) : adaptor.innerHTML(node));
-            console.log(argv.styles ? html.replace(/<defs>/, `<defs><style>${CSS}</style>`) : html);
+            console.log(adaptor.outerHTML(node));
         };
     });
 }).catch(err => console.log(err));
