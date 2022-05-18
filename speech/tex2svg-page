@@ -30,14 +30,15 @@ const {mathjax} = require('mathjax-full/js/mathjax.js');
 const {TeX} = require('mathjax-full/js/input/tex.js');
 const {MathML} = require('mathjax-full/js/input/mathml.js');
 const {SVG} = require('mathjax-full/js/output/svg.js');
-const {jsdomAdaptor} = require('mathjax-full/js/adaptors/jsdomAdaptor.js');
+const {liteAdaptor} = require('mathjax-full/js/adaptors/liteAdaptor.js');
+// const {jsdomAdaptor} = require('mathjax-full/js/adaptors/jsdomAdaptor.js');
 const {RegisterHTMLHandler} = require('mathjax-full/js/handlers/html.js');
 const {EnrichHandler} = require('mathjax-full/js/a11y/semantic-enrich.js');
-const {Sre} = require('mathjax-full/js/a11y/sre.js');
+// const {Sre} = require('mathjax-full/js/a11y/sre.js');
 
 const {AllPackages} = require('mathjax-full/js/input/tex/AllPackages.js');
 
-const {JSDOM} = require('jsdom');
+// const {JSDOM} = require('jsdom');
 
 require('mathjax-full/js/util/entities/all.js');
 
@@ -68,7 +69,8 @@ const htmlfile = require('fs').readFileSync(argv._[0], 'utf8');
 //
 //  Create DOM adaptor and register it for HTML documents
 //
-const adaptor = jsdomAdaptor(JSDOM);
+const adaptor = liteAdaptor({fontSize: argv.em});
+// const adaptor = jsdomAdaptor(JSDOM);
 EnrichHandler(RegisterHTMLHandler(adaptor), new MathML());
 // RegisterHTMLHandler(adaptor);
 
@@ -81,6 +83,7 @@ const svg = new SVG({fontCache: argv.fontCache});
 const html = mathjax.document(htmlfile, {InputJax: tex, OutputJax: svg,
     enableEnrichment: true,
     sre: {
+      json: '/home/sorge/git/MathJax/MathJax-src/es5/sre/mathmaps',
       speech: 'deep'
     },
     renderActions: require('./action.js').speechAction
@@ -108,3 +111,6 @@ if (Array.from(html.math).length === 0) {
 //
 console.log(adaptor.doctype(html.document));
 console.log(adaptor.outerHTML(adaptor.root(html.document)));
+// Sre.setupEngine({json: '/home/sorge/git/MathJax/MathJax-src/es5/sre/mathmaps'})
+//   .then(() => Sre.sreReady())
+//   .then(() => {              });
