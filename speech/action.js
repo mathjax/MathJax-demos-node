@@ -20,30 +20,45 @@ function removeSemanticData(math) {
 
 
 //
-// Moves a speech element into the description element for SVG output.
+// Moves all speech elements into aria-labels for SVG output. This allows for
+// elements without containers some limited exploration.
 //
 // Note, that here we cannot walk the source tree, as we alterations are to be
 // done on the typeset element, if it is a SVG node.
 //
-function speechToDescription(math) {
+function speechToRoles(math) {
   const root = math.typesetRoot;
   const adaptor = math.adaptor;
   const svg = adaptor.childNodes(root)[0];
   if (!svg || adaptor.kind(svg) !== 'svg') return;
+  adaptor.removeAttribute(svg, 'aria-hidden');
+  adaptor.removeAttribute(svg, 'role');
   const children = [svg];
   while (children.length) {
     let child = children.shift();
     if (adaptor.kind(child) === '#text') continue;
     if (adaptor.hasAttribute(child, 'data-semantic-speech')) {
-      let desc = adaptor.create('desc');
-      let text = adaptor.text(adaptor.getAttribute(child, 'data-semantic-speech'));
-      adaptor.append(desc, text);
-      adaptor.append(child, desc);
+      let text = adaptor.getAttribute(child, 'data-semantic-speech');
+      adaptor.setAttribute(child, 'aria-label', text);
+      adaptor.setAttribute(child, 'role', 'img');
       adaptor.removeAttribute(child, 'data-semantic-speech');
     }
     children.push(...adaptor.childNodes(child));
   }
 }
+
+//
+// Sets the rendered roots role to image if their is an aria-label to speak
+// custom elements.
+//
+function roleImg(math) {
+  const adaptor = math.adaptor;
+  const root = math.typesetRoot;
+  if (adaptor.hasAttribute(root, 'aria-label')) {
+    adaptor.setAttribute(root, 'role', 'img');
+  }
+}
+
 
 //
 // Configures SRE from key value pairs by populating MathJax's config options.
@@ -61,12 +76,6 @@ exports.dataPairs = function(data) {
 
 exports.sreconfig = function(data) {
   const config = exports.dataPairs(data);
-  if (data) {
-    for (let i = 0, key; key = data[i]; i++) {
-      let value = data[++i];
-      config[key] = value || false;
-    }
-  }
   if (!MathJax.config.options) {
     MathJax.config.options = {};
   }
@@ -95,15 +104,26 @@ exports.speechAction = {
       removeSemanticData(math);
     }
   ],
-  describe: [
+  role: [
     1000,
     (doc) => {
       for (const math of doc.math) {
-        speechToDescription(math);
+        roleImg(math);
       }
     },
     (math, doc) => {
-      speechToDescription(math);
+      roleImg(math);
+    }
+  ],
+  describe: [
+    1001,
+    (doc) => {
+      for (const math of doc.math) {
+        speechToRoles(math);
+      }
+    },
+    (math, doc) => {
+      speechToRoles(math);
     }
   ]
 

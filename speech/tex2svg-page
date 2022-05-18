@@ -31,14 +31,9 @@ const {TeX} = require('mathjax-full/js/input/tex.js');
 const {MathML} = require('mathjax-full/js/input/mathml.js');
 const {SVG} = require('mathjax-full/js/output/svg.js');
 const {liteAdaptor} = require('mathjax-full/js/adaptors/liteAdaptor.js');
-// const {jsdomAdaptor} = require('mathjax-full/js/adaptors/jsdomAdaptor.js');
 const {RegisterHTMLHandler} = require('mathjax-full/js/handlers/html.js');
 const {EnrichHandler} = require('mathjax-full/js/a11y/semantic-enrich.js');
-// const {Sre} = require('mathjax-full/js/a11y/sre.js');
-
 const {AllPackages} = require('mathjax-full/js/input/tex/AllPackages.js');
-
-// const {JSDOM} = require('jsdom');
 
 require('mathjax-full/js/util/entities/all.js');
 
@@ -47,19 +42,42 @@ require('mathjax-full/js/util/entities/all.js');
 //  Get the command-line arguments
 //
 const argv = require('yargs')
-  .demand(1).strict()
-  .usage('$0 [options] file.html > converted.html')
-  .options({
-     packages: {
-       default: AllPackages.sort().join(', '),
-       describe: 'the packages to use, e.g. "base, ams"'
-     },
-    fontCache: {
-      default: 'global',
-      describe: 'cache type: local, global, none'
-    }
-  })
-  .argv;
+    .demand(1).strict()
+    .usage('$0 [options] file.html > converted.html')
+    .options({
+        em: {
+            default: 16,
+            describe: 'em-size in pixels'
+        },
+        ex: {
+            default: 8,
+            describe: 'ex-size in pixels'
+        },
+        packages: {
+            default: AllPackages.sort().join(', '),
+            describe: 'the packages to use, e.g. "base, ams"'
+        },
+        sre: {
+            array: true,
+            nargs: 2,
+            describe: 'SRE flags as key value pairs, e.g., "--sre locale de --sre domain clearspeak" generates speech in German with clearspeak rules'
+        },
+        speech: {
+            default: 'shallow',
+            describe: 'level of speech: deep, shallow, none'
+        },
+        container: {
+            boolean: true,
+            describe: 'include <mjx-container> element'
+        },
+        fontCache: {
+            default: 'global',
+            describe: 'cache type: local, global, none'
+        }
+    })
+    .argv;
+
+const action = require('./action.js');
 
 //
 //  Read the HTML file
@@ -70,9 +88,37 @@ const htmlfile = require('fs').readFileSync(argv._[0], 'utf8');
 //  Create DOM adaptor and register it for HTML documents
 //
 const adaptor = liteAdaptor({fontSize: argv.em});
-// const adaptor = jsdomAdaptor(JSDOM);
 EnrichHandler(RegisterHTMLHandler(adaptor), new MathML());
-// RegisterHTMLHandler(adaptor);
+
+// 
+//  Get feature vector for SRE setup. If necessary, compute the path to the
+//  locale JSON files explicitly.
+//
+const feature = action.dataPairs(argv.sre);
+feature.speech = argv.speech;
+feature.json = feature.json ? feature.json :
+  require.resolve('mathjax-full/es5/sre/mathmaps/base.json').replace(/\/base\.json$/, '');
+
+//
+//  Remove container elements for all math items, by setting the typesetting
+//  root to the svg element directly.
+//
+if (!argv.container) {
+  action.speechAction.container = [
+    199,
+    (doc) => {
+      for (let math of doc.math) {
+        console.log(math);
+        math.typesetRoot = adaptor.childNodes(math.typesetRoot)[0];
+      }
+    },
+    (math, doc) => {
+      math.typesetRoot = adaptor.childNodes(math.typesetRoot)[0];
+    }
+  ];
+}
+
+
 
 
 //
@@ -82,35 +128,31 @@ const tex = new TeX({packages: argv.packages.split(/\s*,\s*/)});
 const svg = new SVG({fontCache: argv.fontCache});
 const html = mathjax.document(htmlfile, {InputJax: tex, OutputJax: svg,
     enableEnrichment: true,
-    sre: {
-      json: '/home/sorge/git/MathJax/MathJax-src/es5/sre/mathmaps',
-      speech: 'deep'
-    },
-    renderActions: require('./action.js').speechAction
+    sre: feature,
+    renderActions: action.speechAction
   }
 );
 
+console.log(html.renderActions);
 
 //
 //  Typeset the document
 //
-html.render();
+mathjax.handleRetriesFor(() => html.render()).then(
+  () => {
+    //
+    //  If no math was found on the page, remove the stylesheet and font cache (if any)
+    //
+    if (Array.from(html.math).length === 0) {
+      adaptor.remove(html.outputJax.svgStyles);
+      const cache = adaptor.elementById(adaptor.body(html.document), 'MJX-SVG-global-cache');
+      if (cache) adaptor.remove(cache);
+    }
 
-
-//
-//  If no math was found on the page, remove the stylesheet and font cache (if any)
-//
-if (Array.from(html.math).length === 0) {
-  adaptor.remove(html.outputJax.svgStyles);
-  const cache = adaptor.elementById(adaptor.body(html.document), 'MJX-SVG-global-cache');
-  if (cache) adaptor.remove(cache);
-}
-
-//
-//  Output the resulting HTML
-//
-console.log(adaptor.doctype(html.document));
-console.log(adaptor.outerHTML(adaptor.root(html.document)));
-// Sre.setupEngine({json: '/home/sorge/git/MathJax/MathJax-src/es5/sre/mathmaps'})
-//   .then(() => Sre.sreReady())
-//   .then(() => {              });
+    //
+    //  Output the resulting HTML
+    //
+    console.log(adaptor.doctype(html.document));
+    console.log(adaptor.outerHTML(adaptor.root(html.document)));
+  }
+);
