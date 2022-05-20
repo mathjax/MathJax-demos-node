@@ -66,10 +66,6 @@ const argv = require('yargs')
             default: 'shallow',
             describe: 'level of speech: deep, shallow, none'
         },
-        container: {
-            boolean: true,
-            describe: 'include <mjx-container> element'
-        },
         fontCache: {
             default: 'global',
             describe: 'cache type: local, global, none'
@@ -100,28 +96,6 @@ feature.json = feature.json ? feature.json :
   require.resolve('mathjax-full/es5/sre/mathmaps/base.json').replace(/\/base\.json$/, '');
 
 //
-//  Remove container elements for all math items, by setting the typesetting
-//  root to the svg element directly.
-//
-if (!argv.container) {
-  action.speechAction.container = [
-    199,
-    (doc) => {
-      for (let math of doc.math) {
-        console.log(math);
-        math.typesetRoot = adaptor.childNodes(math.typesetRoot)[0];
-      }
-    },
-    (math, doc) => {
-      math.typesetRoot = adaptor.childNodes(math.typesetRoot)[0];
-    }
-  ];
-}
-
-
-
-
-//
 //  Create input and output jax and a document using them on the content from the HTML file
 //
 const tex = new TeX({packages: argv.packages.split(/\s*,\s*/)});
@@ -132,8 +106,6 @@ const html = mathjax.document(htmlfile, {InputJax: tex, OutputJax: svg,
     renderActions: action.speechAction
   }
 );
-
-console.log(html.renderActions);
 
 //
 //  Typeset the document

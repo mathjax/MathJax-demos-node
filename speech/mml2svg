@@ -71,6 +71,11 @@ var argv = require('yargs')
         default: 'shallow',
         describe: 'level of speech: deep, shallow, none'
       },
+      sre: {
+        array: true,
+        nargs: 2,
+        describe: 'SRE flags as key value pairs, e.g., "--sre locale de --sre domain clearspeak" generates speech in German with clearspeak rules'
+      },
       styles: {
         boolean: true,
         default: true,
@@ -92,11 +97,22 @@ var argv = require('yargs')
     })
     .argv;
 
+const action = require('./action.js');
+
 //
 //  Create DOM adaptor and register it for HTML documents
 //
 const adaptor = liteAdaptor();
 EnrichHandler(RegisterHTMLHandler(adaptor), new MathML());
+
+// 
+//  Get feature vector for SRE setup. If necessary, compute the path to the
+//  locale JSON files explicitly.
+//
+const feature = action.dataPairs(argv.sre);
+feature.speech = argv.speech;
+feature.json = feature.json ? feature.json :
+  require.resolve('mathjax-full/es5/sre/mathmaps/base.json').replace(/\/base\.json$/, '');
 
 //
 //  Create input and output jax and a document using them on the content from the HTML file
@@ -106,28 +122,29 @@ const svg = new SVG({fontCache: (argv.fontCache ? 'local' : 'none')});
 const html = mathjax.document('', {
   InputJax: mml,
   OutputJax: svg,
-  sre: {speech: argv.speech},
-  renderActions: require('./action.js').speechAction
+  sre: feature,
+  renderActions: action.speechAction
 });
 
 //
 //  Typeset the math from the command line
 //
-const node = html.convert(argv._[0] || '', {
+mathjax.handleRetriesFor(() => html.convert(argv._[0] || '', {
   display: !argv.inline,
   em: argv.em,
   ex: argv.ex,
   containerWidth: argv.width
-});
+})).then((node) => {
 
-//
-//  If the --css option was specified, output the CSS,
-//  Otherwise, typeset the math and output the HTML
-//
-if (argv.css) {
-  console.log(adaptor.textContent(svg.styleSheet(html)));
-} else {
-  console.log(argv.container);
-  let html = (argv.container ? adaptor.outerHTML(node) : adaptor.innerHTML(node));
-  console.log(argv.styles ? html.replace(/<defs>/, `<defs><style>${CSS}</style>`) : html);
-}
+  //
+  //  If the --css option was specified, output the CSS,
+  //  Otherwise, typeset the math and output the HTML
+  //
+  if (argv.css) {
+    console.log(adaptor.textContent(svg.styleSheet(html)));
+  } else {
+    console.log(argv.container);
+    let html = (argv.container ? adaptor.outerHTML(node) : adaptor.innerHTML(node));
+    console.log(argv.styles ? html.replace(/<defs>/, `<defs><style>${CSS}</style>`) : html);
+  }
+});

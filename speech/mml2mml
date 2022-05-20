@@ -2,9 +2,9 @@
 
 /*************************************************************************
  *
- *  speech/mml2svg-page
+ *  speech/mml2mml
  *
- *  Uses MathJax v3 to convert all MathML in an HTML document to SVG with speech.
+ *  Uses MathJax v3 to convert a MathML string to a MathML string with alttext.
  *
  * ----------------------------------------------------------------------
  *
@@ -23,33 +23,26 @@
  *  limitations under the License.
  */
 
+
 //
 //  Get the command-line arguments
 //
 var argv = require('yargs')
     .demand(0).strict()
-    .usage('$0 [options] file.html > converted.html')
+    .usage('$0 [options] "math" > file.html')
     .options({
-        em: {
-            default: 16,
-            describe: 'em-size in pixels'
-        },
-        ex: {
-            default: 8,
-            describe: 'ex-size in pixels'
-        },
-        speech: {
-            default: 'shallow',
-            describe: 'level of speech: deep, shallow, none'
+        inline: {
+            boolean: true,
+            describe: "process as inline math"
         },
         sre: {
             array: true,
             nargs: 2,
             describe: 'SRE flags as key value pairs, e.g., "--sre locale de --sre domain clearspeak" generates speech in German with clearspeak rules'
         },
-        fontCache: {
-            default: 'global',
-            describe: 'cache type: local, global, none'
+        speech: {
+            default: 'shallow',
+            describe: 'level of speech: deep, shallow, none'
         },
         dist: {
             boolean: true,
@@ -59,54 +52,70 @@ var argv = require('yargs')
     })
     .argv;
 
-//
-//  Read the HTML file
-//
-const htmlfile = require('fs').readFileSync(argv._[0], 'utf8');
+const action = require('./action.js');
 
 //
-// Configure MathJax
+// Add a render action to move the computed speech into the alttext attribute.
+//
+function moveSpeech(math) {
+  let alttext = '';
+  math.root.walkTree(node => {
+    const attributes = node.attributes.getAllAttributes();
+    console.log(attributes);
+    if (!alttext && attributes['data-semantic-speech']) {
+      alttext = attributes['data-semantic-speech'];
+    }
+    delete attributes['data-semantic-speech'];
+  });
+  math.root.attributes.getAllAttributes()['alttext'] = alttext;
+};
+
+action.speechAction.alttext = [
+  99,
+  (doc) => {
+    for (const math of doc.math) {
+      moveSpeech(math);
+    }
+  },
+  (math, doc) => {
+    moveSpeech(math);
+  }
+];
+
+//
+//  Configure MathJax
 //
 MathJax = {
     loader: {
         paths: {mathjax: 'mathjax-full/es5'},
         source: (argv.dist ? {} : require('mathjax-full/components/src/source.js').source),
         require: require,
-        load: ['adaptors/liteDOM', 'a11y/semantic-enrich']
-    },
-    svg: {
-        fontCache: argv.fontCache,
-        exFactor: argv.ex / argv.em
-    },
-    'adaptors/liteDOM': {
-        fontSize: argv.em
+        load: ['input/mml', 'adaptors/liteDOM', 'a11y/semantic-enrich']
     },
     options: {
-        enableAssistiveMml: false,
         sre: {speech: argv.speech},
-        renderActions: require('./action.js').speechAction
-    },
-    startup: {
-        document: htmlfile
+        renderActions: action.speechAction
     }
-}
+};
 
 //
 //  Load the MathJax startup module
 //
-require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/mml-svg') + '/mml-svg.js');
+require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/startup') + '/startup.js');
+
+//
+// Filling the sre options from command line
+//
+action.sreconfig(argv.sre);
 
 //
 //  Wait for MathJax to start up, and then typeset the math
 //
 MathJax.startup.promise.then(() => {
-    const adaptor = MathJax.startup.adaptor;
-    const html = MathJax.startup.document;
-    if (Array.from(html.math).length === 0) {
-      adaptor.remove(html.outputJax.svgStyles);
-      const cache = adaptor.elementById(adaptor.body(html.document), 'MJX-SVG-global-cache');
-      if (cache) adaptor.remove(cache);
-    }
-    console.log(adaptor.doctype(html.document));
-    console.log(adaptor.outerHTML(adaptor.root(html.document)));
+    MathJax.mathml2mmlPromise(argv._[0] || '', {
+        display: !argv.inline,
+        em: argv.em,
+        ex: argv.ex,
+        containerWidth: argv.width
+    }).then(mml => console.log(mml));
 }).catch(err => console.log(err));
