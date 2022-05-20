@@ -99,7 +99,7 @@ const node = html.convert(argv._[0] || '', {
 const visitor = new SerializedMmlVisitor();
 const mml = visitor.visitTree(node, html);
 
-// 
+//
 //  Get feature vector for SRE setup. If necessary, compute the path to the
 //  locale JSON files explicitly.
 //
@@ -109,7 +109,7 @@ feature.json = feature.json ? feature.json :
 
 //
 //  Run SRE, by first setting it up and then compute the speech string.
-// 
+//
 //  Note, that after setting up the engine, we need to wait for it to be ready,
 //  so it has finished loading its rule files.
 //

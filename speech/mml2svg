@@ -105,7 +105,7 @@ const action = require('./action.js');
 const adaptor = liteAdaptor();
 EnrichHandler(RegisterHTMLHandler(adaptor), new MathML());
 
-// 
+//
 //  Get feature vector for SRE setup. If necessary, compute the path to the
 //  locale JSON files explicitly.
 //

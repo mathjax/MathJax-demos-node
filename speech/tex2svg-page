@@ -86,7 +86,7 @@ const htmlfile = require('fs').readFileSync(argv._[0], 'utf8');
 const adaptor = liteAdaptor({fontSize: argv.em});
 EnrichHandler(RegisterHTMLHandler(adaptor), new MathML());
 
-// 
+//
 //  Get feature vector for SRE setup. If necessary, compute the path to the
 //  locale JSON files explicitly.
 //
