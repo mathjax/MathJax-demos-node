@@ -1,0 +1,89 @@
+#! /usr/bin/env -S node -r esm
+
+/*************************************************************************
+ *
+ *  preload/am2mml
+ *
+ *  Uses MathJax v3 to convert an AsciiMath string to a MathML string.
+ *
+ * ----------------------------------------------------------------------
+ *
+ *  Copyright (c) 2019 The MathJax Consortium
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+
+//
+//  Get the command-line arguments
+//
+var argv = require('yargs')
+    .demand(0).strict()
+    .usage('$0 [options] "math"')
+    .options({
+        em: {
+            default: 16,
+            describe: 'em-size in pixels'
+        },
+        ex: {
+            default: 8,
+            describe: 'ex-size in pixels'
+        },
+        width: {
+            default: 80 * 16,
+            describe: 'width of container in pixels'
+        }
+    })
+    .argv;
+
+//
+//  Configure MathJax
+//
+MathJax = {
+    startup: {typeset: false},
+    loader: {require: require}
+};
+
+//
+//  Load all the needed components
+//
+require('mathjax-full/components/src/startup/lib/startup.js');
+require('mathjax-full/components/src/core/core.js');
+require('mathjax-full/components/src/adaptors/liteDOM/liteDOM.js');
+require('mathjax-full/components/src/input/asciimath/asciimath.js');
+require('mathjax-full/components/src/startup/startup.js');
+
+//
+//  Let MathJax know these are loaded
+//
+MathJax.loader.preLoad(
+    'core',
+    'adaptors/liteDOM',
+    'input/asciimath',
+);
+
+//
+//  Create the MathJax methods for the input and output that is loaded
+//
+MathJax.config.startup.ready();
+
+//
+//  Convert the math from the command line
+//
+const adaptor = MathJax.startup.adaptor;
+console.log(MathJax.asciimath2mml(argv._[0] || '', {
+    display: false,
+    em: argv.em,
+    ex: argv.ex,
+    containerWidth: argv.width
+}));

@@ -1,0 +1,92 @@
+#! /usr/bin/env -S node -r esm
+
+/*************************************************************************
+ *
+ *  custom-tex-extension/tex2mml
+ *
+ *  Uses MathJax v3 to show how to create and load a custom tex extension.
+ *
+ * ----------------------------------------------------------------------
+ *
+ *  Copyright (c) 2019 The MathJax Consortium
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+/*
+ * The mml extension defines \mi{}, \mo{}, \mn{}, \ms{}, \mtext{} for creating
+ * MathML token elements by hand.  They take an optional bracketed argument
+ * that gives the attributes for the element, e.g.
+ *
+ *    \mi[mathvariant="bold-italic"]{abc}
+ *
+ * The text for the token element is taken as a literal string, except for
+ * the special sequence \uXXXX, which produces the unicode character U+XXXX.
+ */
+
+//
+//  The default TeX packages to use
+//
+const PACKAGES = 'base, autoload, require, ams, newcommand, mml';
+
+//
+//  Get the command-line arguments
+//
+var argv = require('yargs')
+    .demand(0).strict()
+    .usage('$0 [options] "math" > file.html')
+    .options({
+        inline: {
+            boolean: true,
+            describe: "process as inline math"
+        },
+        packages: {
+            default: PACKAGES,
+            describe: 'the packages to use, e.g. "base, ams"; use "*" to represent the default packages, e.g, "*, bbox"'
+        },
+        dist: {
+            boolean: true,
+            default: false,
+            describe: 'true to use webpacked version, false to use mathjax3 source files'
+        }
+    })
+    .argv;
+
+//
+//  Configure MathJax
+//
+MathJax = {
+    loader: {
+        paths: {
+            mathjax: 'mathjax-full/es5',
+            custom: '.'
+        },
+        source: (argv.dist ? {} : require('mathjax-full/components/src/source.js').source),
+        require: require,
+        load: ['input/tex', 'adaptors/liteDOM', '[custom]/mml']
+    },
+    tex: {packages: argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/)},
+    startup: {
+        pageReady: () => {
+            MathJax.tex2mmlPromise(argv._[0] || '', {display: !argv.inline})
+                .then(mml => console.log(mml))
+                .catch(err => console.log(err));
+        }
+    }
+};
+
+//
+//  Load the MathJax startup module
+//
+require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/startup') + '/startup.js');
+

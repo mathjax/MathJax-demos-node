@@ -1,0 +1,132 @@
+#! /usr/bin/env node
+
+/*************************************************************************
+ *
+ *  puppeteer/tex2svg
+ *
+ *  Uses MathJax v3 to convert a TeX string to an SVG string
+ *  inside a headless Chrome via puppeteer.
+ *
+ * ----------------------------------------------------------------------
+ *
+ *  Copyright (c) 2020 The MathJax Consortium
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+const puppeteer = require('puppeteer');
+const fs = require('fs');
+const path = require('path');
+
+//
+//  The default packages to include
+//
+const PACKAGES = 'base, ams, newcommand, autoload, require';
+
+//
+//  Get the command-line arguments
+//
+var argv = require('yargs')
+  .demand(0).strict()
+  .usage('$0 [options] "math" > file.svg')
+  .options({
+    inline: {
+      boolean: true,
+      describe: "process as inline math"
+    },
+    packages: {
+      default: PACKAGES,
+      describe: 'the packages to use, e.g. "base, ams"'
+    },
+    fontCache: {
+      boolean: true,
+      default: true,
+      describe: 'whether to use a local font cache or not'
+    },
+    textfont: {
+      default: 'Times',
+      describe: 'the font to use for text-mode material'
+    }
+  })
+  .argv;
+
+
+//
+// HTML shell file (need a file:// URL so we can load other files)
+//
+const html = 'file://' + path.resolve(__dirname, 'puppeteer.html');
+
+//
+//  Path to MathJax root, and the component to load
+//
+const component = require.resolve('mathjax-full/es5/tex-svg-full.js');
+const root = path.dirname(component);
+
+//
+//  Get the TeX string to process
+//
+const math = argv._[0] || '';
+
+//
+//  The display mode to use
+//
+const display = {display: !argv.inline};
+
+//
+//  The configuration to use for MathJax
+//
+const config = 'MathJax = ' + JSON.stringify({
+  tex: {
+    packages: argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/)
+  },
+  svg: {
+    mtextFont: argv.textfont,
+    merrorFont: argv.textfont,
+    fontCache: (argv.fontCache ? 'local' : 'none')
+  },
+  loader: {
+    paths: {
+      mathjax: `file://${root}`
+    }
+  },
+  startup: {
+    typeset: false
+  }
+});
+
+//
+//  Open the HTML page above in Puppeteer and use MathJax in that page
+//  to convert the TeX to SVG, and print the result.
+//
+(async () => {
+  const browser = await puppeteer.launch();       // launch the browser
+  const page = await browser.newPage();           // and get a new page.
+  await page.goto(html);                          // open the shell HTML page
+  await page.addScriptTag({content: config});     // configure MathJax
+  await page.addScriptTag({path: component});     // load the MathJax conponent
+  return page.evaluate((math, display) => {       // the following is performed in the browser...
+    return MathJax.startup.promise.then(() => {                      // wait for MathJax to be ready
+      return MathJax.tex2svgPromise(math, display).then((m) => {     // convert TeX to svg
+        return m.firstChild.outerHTML.replace(/&nbsp;/g, '\&#A0;')   //   then change &nbsp; to &#A0;
+      });
+    });
+  }, math, display).then((svg) => {               // if successful:
+    console.log(svg);                             //   output the resulting svg
+    return browser.close();                       //   close the browser
+  }).catch((e) => {                               // if there is an error:
+    browser.close();                              //   close the browser
+    throw e;                                      //   throw the error again (handled below)
+  });
+})().catch((e) => {                // If the process produces an error
+  console.error(e.message);        //   reoport the error
+});

@@ -1,0 +1,97 @@
+#! /usr/bin/env -S node -r esm
+
+/*************************************************************************
+ *
+ *  component/tex2mml
+ *
+ *  Uses MathJax v3 to convert a TeX string to a MathML string.
+ *
+ * ----------------------------------------------------------------------
+ *
+ *  Copyright (c) 2019 The MathJax Consortium
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+
+//
+//  The default TeX packages to use
+//
+const PACKAGES = 'base, autoload, ams, newcommand, require';
+
+//
+//  Get the command-line arguments
+//
+var argv = require('yargs')
+    .demand(0).strict()
+    .usage('$0 [options] "math"')
+    .options({
+        inline: {
+            boolean: true,
+            describe: "process as inline math"
+        },
+        em: {
+            default: 16,
+            describe: 'em-size in pixels'
+        },
+        ex: {
+            default: 8,
+            describe: 'ex-size in pixels'
+        },
+        width: {
+            default: 80 * 16,
+            describe: 'width of container in pixels'
+        },
+        packages: {
+            default: PACKAGES,
+            describe: 'the packages to use, e.g. "base, ams"; use "*" to represent the default packages, e.g, "*, bbox"'
+        },
+        dist: {
+            boolean: true,
+            default: false,
+            describe: 'true to use webpacked version, false to use MathJax source files'
+        }
+    })
+    .argv;
+
+//
+//  Configure MathJax
+//
+MathJax = {
+    loader: {
+        paths: {mathjax: 'mathjax-full/es5'},
+        source: (argv.dist ? {} : require('mathjax-full/components/src/source.js').source),
+        require: require,
+        load: ['input/tex-full', 'adaptors/liteDOM']
+    },
+    tex: {
+        packages: argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/)
+    }
+}
+
+//
+//  Load the MathJax startup module
+//
+require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/startup') + '/startup.js');
+
+//
+//  Wait for MathJax to start up, and then typeset the math
+//
+MathJax.startup.promise.then(() => {
+    MathJax.tex2mmlPromise(argv._[0] || '', {
+        display: !argv.inline,
+        em: argv.em,
+        ex: argv.ex,
+        containerWidth: argv.width
+    }).then(mml => console.log(mml));
+}).catch(err => console.log(err));

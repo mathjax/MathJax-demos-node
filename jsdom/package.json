@@ -1,9 +1,9 @@
 {
-  "name": "MathJax-demos-node",
+  "name": "MathJax-jsdom",
   "version": "3.2.0",
-  "description": "Demos using MathJax v3 in node",
+  "description": "MathJax v3 running in a jsdom instance",
   "dependencies": {
-    "esm": "^3.2.25",
+    "jsdom": "^16.6.0",
     "mathjax-full": "^3.2.0",
     "yargs": "^17.0.1"
   },
@@ -19,10 +19,8 @@
     "type": "git",
     "url": "https://github.com/mathjax/MathJax-demos-node/"
   },
-  "keywords": [
-    "MathJax",
-    "examples",
-    "nodejs"
-  ],
+  "scripts": {
+    "make-adaptor": "node_modules/mathjax-full/components/bin/makeAll adaptor"
+  },
   "license": "Apache-2.0"
 }
