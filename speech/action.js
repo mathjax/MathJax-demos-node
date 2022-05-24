@@ -1,7 +1,8 @@
 require('mathjax-full/js/util/asyncLoad/node.js');
-// This is loaded to import `STATE.ENRICHED` is set.
+// This is loaded to ensure `STATE.ENRICHED` is set.
 require('mathjax-full/js/a11y/semantic-enrich.js');
-const {STATE} = require('mathjax-full/js/core/MathItem.js');
+const {newState, STATE} = require('mathjax-full/js/core/MathItem.js');
+
 
 //
 //  Remove the data-semantic-* attributes other than data-semantic-speech
@@ -21,16 +22,16 @@ function removeSemanticData(math) {
 
 //
 // Moves all speech elements into aria-labels for SVG output. This allows for
-// elements without containers some limited exploration.
+// elements without containers to have some limited exploration.
 //
-// Note, that here we cannot walk the source tree, as we alterations are to be
+// Note, that here we cannot walk the source tree, as alterations are to be
 // done on the typeset element, if it is a SVG node.
 //
 function speechToRoles(math) {
   const root = math.typesetRoot;
   const adaptor = math.adaptor;
-  const svg = adaptor.childNodes(root)[0];
-  if (!svg || adaptor.kind(svg) !== 'svg') return;
+  const svg = adaptor.tags(root, 'svg')[0];
+  if (!svg) return;
   adaptor.removeAttribute(svg, 'aria-hidden');
   adaptor.removeAttribute(svg, 'role');
   const children = [svg];
@@ -85,16 +86,37 @@ exports.sreconfig = function(data) {
   Object.assign(MathJax.config.options.sre, config);
 };
 
+//
+// Let's define some new states for enlisting new renderActions into the queue.
+//
+// STATE.ENRICHED is the priority of the enrichment. Enrichment happens before
+// elements are rendered (i.e., typeset) and therefore all attributes added during
+// enrichment will be part of the MathItem.
+//
+// STATE 1000 is so hight that any other render action should be done by
+// then. That is, the MathItem is fully typeset in the document.
+//
+newState('SIMPLIFY', STATE.ENRICHED + 1);
+newState('ROLE', 1000);
+newState('DESCRIBE', STATE.ROLE + 1);
 
 //
-//  The renderActions needed to remove the data-semantic-attributes.
-//    STATE.ENRICHED is the priority of the enrichment, so this will run just after enrichment.
+// The renderActions needed for manipulating MathItems with speech entries.
+// We define three render actions, each with two functions:
 //    The first function is the one for when the document's render() method is called.
 //    The second is for when a MathItem's render(), rerender() or convert() method is called.
 //
+// simplify: Removes the data-semantic-attributes except speech directly after enrichment.
+//
+// role: Adds an aria role to the container element so aria-labels are spoken on custom elements.
+//       This happens after typesetting.
+//
+// describe: Rewrites speech attributes into aria-labels with img roles in SVGs.
+//       This happens after container elements are rewritten.
+//
 exports.speechAction = {
   simplify: [
-    STATE.ENRICHED + 1,
+    STATE.SIMPLIFY,
     (doc) => {
       for (const math of doc.math) {
         removeSemanticData(math);
@@ -105,7 +127,7 @@ exports.speechAction = {
     }
   ],
   role: [
-    1000,
+    STATE.ROLE,
     (doc) => {
       for (const math of doc.math) {
         roleImg(math);
@@ -116,7 +138,7 @@ exports.speechAction = {
     }
   ],
   describe: [
-    1001,
+    STATE.DESCRIBE,
     (doc) => {
       for (const math of doc.math) {
         speechToRoles(math);

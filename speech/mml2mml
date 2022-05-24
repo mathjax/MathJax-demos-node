@@ -61,7 +61,6 @@ function moveSpeech(math) {
   let alttext = '';
   math.root.walkTree(node => {
     const attributes = node.attributes.getAllAttributes();
-    console.log(attributes);
     if (!alttext && attributes['data-semantic-speech']) {
       alttext = attributes['data-semantic-speech'];
     }
