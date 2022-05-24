@@ -42,6 +42,11 @@ var argv = require('yargs')
             default: 'shallow',
             describe: 'level of speech: deep, shallow, none'
         },
+        sre: {
+            array: true,
+            nargs: 2,
+            describe: 'SRE flags as key value pairs, e.g., "--sre locale de --sre domain clearspeak" generates speech in German with clearspeak rules'
+        },
         fontCache: {
             default: 'global',
             describe: 'cache type: local, global, none'
@@ -64,7 +69,7 @@ const htmlfile = require('fs').readFileSync(argv._[0], 'utf8');
 //
 MathJax = {
     loader: {
-        paths: {mathjax: 'mathjax-full/es5', sre: 'mathjax-full/js/a11y/sre'},
+        paths: {mathjax: 'mathjax-full/es5'},
         source: (argv.dist ? {} : require('mathjax-full/components/src/source.js').source),
         require: require,
         load: ['adaptors/liteDOM', 'a11y/semantic-enrich']

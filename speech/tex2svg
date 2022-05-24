@@ -69,6 +69,11 @@ var argv = require('yargs')
             default: PACKAGES,
             describe: 'the packages to use, e.g. "base, ams"; use "*" to represent the default packages, e.g, "*, bbox"'
         },
+        sre: {
+            array: true,
+            nargs: 2,
+            describe: 'SRE flags as key value pairs, e.g., "--sre locale de --sre domain clearspeak" generates speech in German with clearspeak rules'
+        },
         speech: {
             default: 'shallow',
             describe: 'level of speech: deep, shallow, none'
@@ -99,12 +104,14 @@ var argv = require('yargs')
     })
     .argv;
 
+const action = require('./action.js');
+
 //
 //  Configure MathJax
 //
 MathJax = {
     loader: {
-        paths: {mathjax: 'mathjax-full/es5', sre: 'mathjax-full/js/a11y/sre-node'},
+        paths: {mathjax: 'mathjax-full/es5'},
         source: (argv.dist ? {} : require('mathjax-full/components/src/source.js').source),
         require: require,
         load: ['adaptors/liteDOM', 'a11y/semantic-enrich']
@@ -116,13 +123,14 @@ MathJax = {
         fontCache: (argv.fontCache ? 'local' : 'none')
     },
     options: {
+        enableAssistiveMml: false,
         sre: {speech: argv.speech},
-        renderActions: require('./action.js').speechAction
+        renderActions: action.speechAction
     },
     startup: {
         typeset: false
     }
-}
+};
 
 //
 //  Load the MathJax startup module
@@ -130,14 +138,19 @@ MathJax = {
 require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/tex-svg') + '/tex-svg.js');
 
 //
+// Filling the sre options from command line
+//
+action.sreconfig(argv.sre);
+
+//
 //  Wait for MathJax to start up, and then typeset the math
 //
 MathJax.startup.promise.then(() => {
-    MathJax.tex2svgPromise(argv._[0] || '', {
+  MathJax.tex2svgPromise(argv._[0] || '', {
         display: !argv.inline,
         em: argv.em,
         ex: argv.ex,
-        containerWidth: argv.width
+        containerWidth: argv.width,
     }).then((node) => {
         const adaptor = MathJax.startup.adaptor;
         //
@@ -147,8 +160,8 @@ MathJax.startup.promise.then(() => {
         if (argv.css) {
             console.log(adaptor.textContent(MathJax.svgStylesheet()));
         } else {
-            let html = (argv.container ? adaptor.outerHTML(node) : adaptor.innerHTML(node));
-            console.log(argv.styles ? html.replace(/<defs>/, `<defs><style>${CSS}</style>`) : html);
+          let html = argv.container ? adaptor.outerHTML(node) : adaptor.innerHTML(node);
+          console.log(argv.styles ? html.replace(/<defs>/, `<defs><style aria-hidden="true">${CSS}</style>`) : html);
         };
     });
 }).catch(err => console.log(err));
