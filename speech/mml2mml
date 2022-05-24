@@ -2,9 +2,9 @@
 
 /*************************************************************************
  *
- *  speech/tex2chtml
+ *  speech/mml2mml
  *
- *  Uses MathJax v3 to convert a TeX string to an HTML string with speech.
+ *  Uses MathJax v3 to convert a MathML string to a MathML string with alttext.
  *
  * ----------------------------------------------------------------------
  *
@@ -25,11 +25,6 @@
 
 
 //
-//  The default TeX packages to use
-//
-const PACKAGES = 'base, autoload, require, ams, newcommand';
-
-//
 //  Get the command-line arguments
 //
 var argv = require('yargs')
@@ -40,22 +35,6 @@ var argv = require('yargs')
             boolean: true,
             describe: "process as inline math"
         },
-        em: {
-            default: 16,
-            describe: 'em-size in pixels'
-        },
-        ex: {
-            default: 8,
-            describe: 'ex-size in pixels'
-        },
-        width: {
-            default: 80 * 16,
-            describe: 'width of container in pixels'
-        },
-        packages: {
-            default: PACKAGES,
-            describe: 'the packages to use, e.g. "base, ams"; use "*" to represent the default packages, e.g, "*, bbox"'
-        },
         sre: {
             array: true,
             nargs: 2,
@@ -64,14 +43,6 @@ var argv = require('yargs')
         speech: {
             default: 'shallow',
             describe: 'level of speech: deep, shallow, none'
-        },
-        css: {
-            boolean: true,
-            describe: 'output the required CSS rather than the HTML itself'
-        },
-        fontURL: {
-            default: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2',
-            describe: 'the URL to use for web fonts'
         },
         dist: {
             boolean: true,
@@ -84,6 +55,33 @@ var argv = require('yargs')
 const action = require('./action.js');
 
 //
+// Add a render action to move the computed speech into the alttext attribute.
+//
+function moveSpeech(math) {
+  let alttext = '';
+  math.root.walkTree(node => {
+    const attributes = node.attributes.getAllAttributes();
+    if (!alttext && attributes['data-semantic-speech']) {
+      alttext = attributes['data-semantic-speech'];
+    }
+    delete attributes['data-semantic-speech'];
+  });
+  math.root.attributes.getAllAttributes()['alttext'] = alttext;
+};
+
+action.speechAction.alttext = [
+  99,
+  (doc) => {
+    for (const math of doc.math) {
+      moveSpeech(math);
+    }
+  },
+  (math, doc) => {
+    moveSpeech(math);
+  }
+];
+
+//
 //  Configure MathJax
 //
 MathJax = {
@@ -91,28 +89,18 @@ MathJax = {
         paths: {mathjax: 'mathjax-full/es5'},
         source: (argv.dist ? {} : require('mathjax-full/components/src/source.js').source),
         require: require,
-        load: ['adaptors/liteDOM', 'a11y/semantic-enrich']
-    },
-    tex: {
-        packages: argv.packages.replace('\*', PACKAGES).split(/\s*,\s*/)
-    },
-    chtml: {
-        fontURL: argv.fontURL
+        load: ['input/mml', 'adaptors/liteDOM', 'a11y/semantic-enrich']
     },
     options: {
-        enableAssistiveMml: false,
         sre: {speech: argv.speech},
         renderActions: action.speechAction
-    },
-    startup: {
-        typeset: false
     }
-}
+};
 
 //
 //  Load the MathJax startup module
 //
-require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/tex-chtml') + '/tex-chtml.js');
+require('mathjax-full/' + (argv.dist ? 'es5' : 'components/src/startup') + '/startup.js');
 
 //
 // Filling the sre options from command line
@@ -123,21 +111,10 @@ action.sreconfig(argv.sre);
 //  Wait for MathJax to start up, and then typeset the math
 //
 MathJax.startup.promise.then(() => {
-    MathJax.tex2chtmlPromise(argv._[0] || '', {
+    MathJax.mathml2mmlPromise(argv._[0] || '', {
         display: !argv.inline,
         em: argv.em,
         ex: argv.ex,
         containerWidth: argv.width
-    }).then((node) => {
-        const adaptor = MathJax.startup.adaptor;
-        //
-        //  If the --css option was specified, output the CSS,
-        //  Otherwise, output the typeset math as HTML
-        //
-        if (argv.css) {
-            console.log(adaptor.textContent(MathJax.chtmlStylesheet()));
-        } else {
-            console.log(adaptor.outerHTML(node));
-        };
-    });
+    }).then(mml => console.log(mml));
 }).catch(err => console.log(err));
