@@ -1,0 +1,74 @@
+#! node
+
+/*************************************************************************
+ *
+ *  mjs/mixed/tex2svg
+ *
+ *  Uses MathJax v4 to convert a TeX string to an SVG string.
+ *
+ * ----------------------------------------------------------------------
+ *
+ *  Copyright (c) 2025 The MathJax Consortium
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+//
+// Load the packages needed for MathJax.
+//
+import {Loader} from '@mathjax/src/js/components/loader.js';
+import {TeX} from '@mathjax/src/js/input/tex.js';
+import {SVG} from '@mathjax/src/js/output/svg.js';
+
+//
+// Load the associated components and mark them as loaded.
+//
+import '@mathjax/src/components/js/input/tex/tex.js';
+import '@mathjax/src/components/js/output/svg/svg.js';
+
+Loader.preLoaded('input/tex', 'output/svg');
+
+//
+// Load the needed utilities.
+//
+import {Mixed} from '../util/Mixed.js';
+import {Util} from '../util/Util.js';
+import {Tex} from '../util/Tex.js';
+import {Svg} from '../util/Svg.js';
+import {Sre} from '../util/Sre.js';
+
+//
+// Get the command-line arguments.
+//
+const args = await Util.args('"math" > file.svg', [Tex, Svg, Sre, Mixed]);
+
+//
+// Create input jax.
+//
+const tex = new TeX(Tex.config(args));
+const svg = new SVG(Svg.config(args));
+
+//
+// Create the MathDocument with the input and output jax.
+//
+const document = Mixed.document(tex, svg, args);
+  
+//
+// Typeset the math and print the result.
+//
+console.log(await Util.typeset(args, Svg, document));
+
+//
+// Tell MathJax we are done.
+//
+document.done();
