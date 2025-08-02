@@ -1,0 +1,22 @@
+{
+  "name": "MathJax-linkdom",
+  "version": "4.0.0",
+  "description": "MathJax v4 running in a linkedom instance",
+  "dependencies": {
+    "linkedom": "^0.18.11"
+  },
+  "type": "module",
+  "devDependencies": {
+    "terser-webpack-plugin": "^5.3.14",
+    "webpack": "^5.100.1",
+    "webpack-cli": "^6.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mathjax/MathJax-demos-node/"
+  },
+  "scripts": {
+    "make-adaptor": "cd linkedomAdaptor && node ../../node_modules/@mathjax/src/components/bin/pack"
+  },
+  "license": "Apache-2.0"
+}

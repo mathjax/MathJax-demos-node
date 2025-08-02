@@ -1,8 +1,8 @@
 /*************************************************************************
  *
- *  jsdom/Jsdom.js
+ *  linkedom/Linkedom.js
  *
- *  Utilities for MathJax v4 command-line tools using jsdom.
+ *  Utilities for MathJax v4 command-line tools using linkedom.
  *
  * ----------------------------------------------------------------------
  *
@@ -22,30 +22,30 @@
  */
 
 import {Util} from '../mjs/util/Util.js';
-import {JSDOM} from 'jsdom';
+import {parseHTML as LINKEDOM} from 'linkedom';
 Util.altDOM = true;
 
-export const Jsdom = {
-  JSDOM: JSDOM,
+export const Linkedom = {
+  LINKEDOM: LINKEDOM,
   
   hooks: {
     loader(_args, config) {
-      config.paths.jsdom = new URL('./jsdomAdaptor', import.meta.url).pathname;
+      config.paths.linkedom = new URL('./linkedomAdaptor', import.meta.url).pathname;
       const i = config.load.indexOf('adaptors/liteDOM');
       if (i >= 0) {
         config.load.splice(i, 1);
       }
-      config.load.unshift('[jsdom]/jsdomAdaptor');
+      config.load.unshift('[linkedom]/linkedomAdaptor');
     },
 
     typeset(_args, config) {
-      config.JSDOM = JSDOM;
+      config.LINKEDOM = LINKEDOM;
     },
 
     async args(args) {
       if (Util.direct) {
-        const {jsdomAdaptor} = await Util.import('@mathjax/src/js/adaptors/jsdomAdaptor.js');
-        Util.adaptor = (args) => jsdomAdaptor(JSDOM, Util.config.adaptor(args));
+        const {linkedomAdaptor} = await Util.import('@mathjax/src/js/adaptors/linkedomAdaptor.js');
+        Util.adaptor = (args) => linkedomAdaptor(LINKEDOM, Util.config.adaptor(args));
       }
     }
   },
