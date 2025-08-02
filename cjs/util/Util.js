@@ -21,8 +21,9 @@
  *  limitations under the License.
  */
 
-const fs = require('fs');
+const fs = require('node:fs');
 const yargs = require('yargs');
+const {hideBin} = require('yargs/helpers');
 
 /**
  * The main utility object.
@@ -36,6 +37,7 @@ const Util = exports.Util = {
   direct: false,  // True for direct and mixed tools vs component-based tools
   mixed: false,   // True for mixed tools
   all: false,     // True for typeset tools
+  altDOM: false,  // True if an alternative to LiteDOM is used
 
   /**
    * Hooks to be called for various actions.
@@ -98,6 +100,9 @@ const Util = exports.Util = {
           default: false,
           describe: 'True to use webpacked files, false to use source files.',
         };
+      }
+      if (Util.altDOM) {
+        delete options.entities;
       }
       return options;
     },
@@ -187,7 +192,7 @@ const Util = exports.Util = {
         failed: (err) => Util.fail(err),
         source: Util.source,
         load: load,
-        require: (file) => Util.import(file),
+        require: require,
         paths: {
           mathjax: '@mathjax/src/bundle'
         },
@@ -227,10 +232,11 @@ const Util = exports.Util = {
      * @returns {OptionList}         The output configuration block
      */
     output(args) {
+      const prefix = Util.direct && !Util.mixed ? `@mathjax/${args.font}-font/js` : `[${args.font}]`;
       return {
         font: args.font,
         fontData: Util.fontData,
-        dynamicPrefix: `[${args.font}]/${args.output}/dynamic`,
+        dynamicPrefix: `${prefix}/${args.output}/dynamic`,
         exFactor: args.ex / args.em,
         displayAlign: args.align,
         displayIndent: args.indent,
@@ -323,7 +329,7 @@ const Util = exports.Util = {
     //
     // Set up the options, check their values, and process the groups.
     //
-    let args = yargs(process.argv.slice(2))
+    let args = yargs(hideBin(process.argv))
         .demandCommand(0).strict()
         .usage('$0 [options] ' + usage)
         .options(options)

@@ -29,7 +29,8 @@ const {Chtml} = require('../util/Chtml.js');
 const {Svg} = require('../util/Svg.js');
 const {Sre} = require('../util/Sre.js');
 
-Util.all = true;  // indicates we are using all options
+Util.all = true;          // Indicates we are using all options
+Util.hooks.typeset = [];  // Hooks for adjusting the typeset configuration
 
 /**
  * The Typeset utility object (for use in the typeset scripts).
@@ -205,6 +206,11 @@ const Typeset = exports.Typeset = {
     this.util.mml = Mml.output;
     config[args.output] = this.util[args.output].config(args);
     this.util.mml = Mml;
+
+    //
+    // Run the typeset configuration hooks
+    //
+    Util.runHooks('typeset', args, config);
 
     //
     // Return the configuration

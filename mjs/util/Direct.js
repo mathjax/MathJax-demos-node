@@ -26,7 +26,6 @@
 // Load the MathJax modules directly
 //
 import {mathjax} from '@mathjax/src/js/mathjax.js';
-//import {liteAdaptor} from '@mathjax/src/js/adaptors/liteAdaptor.js';
 import {RegisterHTMLHandler} from '@mathjax/src/js/handlers/html.js';
 import {SpeechHandler} from '@mathjax/src/js/a11y/speech.js';
 import {MathML} from '@mathjax/src/js/input/mathml.js';

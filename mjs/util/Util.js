@@ -21,9 +21,9 @@
  *  limitations under the License.
  */
 
-import fs from 'fs';
+import fs from 'node:fs';
 import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
+import {hideBin} from 'yargs/helpers';
 
 /**
  * The main utility object.
@@ -192,7 +192,7 @@ export const Util = {
         failed: (err) => Util.fail(err),
         source: Util.source,
         load: load,
-        require: (file) => import(file),
+        require: (file) => Util.import(file),
         paths: {
           mathjax: '@mathjax/src/bundle'
         },
