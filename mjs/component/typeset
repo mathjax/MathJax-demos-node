@@ -46,7 +46,7 @@ const args = await Util.args(
 //
 // Configure MathJax and load the initial component.
 //
-global.MathJax = Typeset.config(args, math);
+global.MathJax = Typeset.config(args);
 await Util.load('startup', args);
 
 //

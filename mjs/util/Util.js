@@ -386,8 +386,8 @@ console.log(kind, hook.toString());
    * @returns {Promise<void>}  A promise that is resovled when MathJax is ready
    */
   load(name, args) {
-    const file = `@mathjax/src/${args.dist ? 'bundle': 'components/mjs/' + name}/${name}.js`;
-    return Util.import(file).then(() => MathJax.startup.promise);
+    const file = `@mathjax/src/${args.dist ? 'bundle': 'components/js/' + name}/${name}.js`;
+    return Util.import(file);
   },
 
   /**
@@ -557,7 +557,7 @@ console.log(kind, hook.toString());
    * @param {object} lib              The output format's utility library object
    * @param {MathDocument} document   The MathDocument used for the conversion
    */
-  async convert(args, lib, document = MathJax.startup.document) {
+  async convert(args, lib, document) {
     //
     // If the lib is the Typeset library, use its output libray as the
     // util and itself to get the conversion options, otherwise use
@@ -577,6 +577,13 @@ console.log(kind, hook.toString());
         console.log('Enter equations to be typeset separated by blank lines:');
       }
       list = Util.read('-').trim().split(/\n\n+/);
+    }
+    //
+    // Make sure MathJax is ready;
+    //
+    if (!docoument) {
+      await MathJax.startup.promise;
+      document = MathJax.startup.document;
     }
     //
     // Convert the list using the document and filter the result using
@@ -612,7 +619,14 @@ console.log(kind, hook.toString());
    * @param {object} lib              The output format's utility library object
    * @param {MathDocument} document   The MathDocument used for the conversion
    */
-  async typeset(args, lib, document = MathJax.startup.document) {
+  async typeset(args, lib, document) {
+    //
+    // Make sure MathJax is ready;
+    //
+    if (!document) {
+      await MathJax.startup.promise;
+      document = MathJax.startup.document;
+    }
     //
     // If the lib is the Typeset library, use its output util, otherwise use the lib itself.
     //
