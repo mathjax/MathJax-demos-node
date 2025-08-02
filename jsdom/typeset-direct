@@ -1,0 +1,68 @@
+#! node
+
+/*************************************************************************
+ *
+ *  jsdom/typeset-direect
+ *
+ *  Uses MathJax v4 to convert any of its formats to any of its output types.
+ *
+ * ----------------------------------------------------------------------
+ *
+ *  Copyright (c) 2025 The MathJax Consortium
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+//
+// Load the needed utilities.
+//
+import {Direct} from '../mjs/util/Direct.js';
+import {Typeset} from '../mjs/util/Typeset.js';
+import {Util} from '../mjs/util/Util.js';
+import {Tex} from '../mjs/util/Tex.js';
+import {Mml} from '../mjs/util/Mml.js';
+import {Am} from '../mjs/util/Am.js';
+import {Chtml} from '../mjs/util/Chtml.js';
+import {Svg} from '../mjs/util/Svg.js';
+import {Sre} from '../mjs/util/Sre.js';
+
+import {Jsdom} from './Jsdom.js';
+
+//
+// Get the command-line arguments.
+//
+const args = await Util.args(
+  '"math or filename" > file',
+  [Typeset, Jsdom, Tex, Mml.input, Am, Chtml, Svg, Mml.output, Sre, Direct]
+);
+
+//
+// Create input and output jax.
+//
+const input = await Typeset.create.input(args);
+const output = await Typeset.create.output(args);
+
+//
+// Create the MathDocument with the input and output jax.
+//
+const document = Direct.document(input, output, args);
+
+//
+// Produce the output for the requested format.
+//
+console.log(await Util.typeset(args, Typeset, document));
+
+//
+// Tell MathJax we are done.
+//
+document.done();

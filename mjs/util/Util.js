@@ -37,6 +37,7 @@ export const Util = {
   direct: false,  // True for direct and mixed tools vs component-based tools
   mixed: false,   // True for mixed tools
   all: false,     // True for typeset tools
+  altDOM: false,  // True if an alternative to LiteDOM is used
 
   /**
    * Hooks to be called for various actions.
@@ -99,6 +100,9 @@ export const Util = {
           default: false,
           describe: 'True to use webpacked files, false to use source files.',
         };
+      }
+      if (Util.altDOM) {
+        delete options.entities;
       }
       return options;
     },
@@ -228,10 +232,11 @@ export const Util = {
      * @returns {OptionList}         The output configuration block
      */
     output(args) {
+      const prefix = Util.direct && !Util.mixed ? `@mathjax/${args.font}-font/js` : `[${args.font}]`;
       return {
         font: args.font,
         fontData: Util.fontData,
-        dynamicPrefix: `[${args.font}]/${args.output}/dynamic`,
+        dynamicPrefix: `${prefix}/${args.output}/dynamic`,
         exFactor: args.ex / args.em,
         displayAlign: args.align,
         displayIndent: args.indent,
@@ -240,7 +245,7 @@ export const Util = {
           inline: args['inline-breaks'],
         },
         mathmlSpacing: args['mml-spacing'],
-      }
+      };
     }
   },
 
@@ -293,7 +298,6 @@ export const Util = {
       //
       if (util.hooks) {
         for (const [kind, hook] of Object.entries(util.hooks)) {
-console.log(kind, hook.toString());
           this.addHook(kind, hook);
         }
       }
@@ -581,7 +585,7 @@ console.log(kind, hook.toString());
     //
     // Make sure MathJax is ready;
     //
-    if (!docoument) {
+    if (!document) {
       await MathJax.startup.promise;
       document = MathJax.startup.document;
     }

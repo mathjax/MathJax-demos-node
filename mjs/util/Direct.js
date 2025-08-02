@@ -26,7 +26,7 @@
 // Load the MathJax modules directly
 //
 import {mathjax} from '@mathjax/src/js/mathjax.js';
-import {liteAdaptor} from '@mathjax/src/js/adaptors/liteAdaptor.js';
+//import {liteAdaptor} from '@mathjax/src/js/adaptors/liteAdaptor.js';
 import {RegisterHTMLHandler} from '@mathjax/src/js/handlers/html.js';
 import {SpeechHandler} from '@mathjax/src/js/a11y/speech.js';
 import {MathML} from '@mathjax/src/js/input/mathml.js';
@@ -54,8 +54,7 @@ export const Direct = {
     //
     // Create DOM adaptor and register it for HTML documents.
     //
-    const adaptor = Util.adjustAdaptor(liteAdaptor(), args);
-    const handler = RegisterHTMLHandler(adaptor);
+    const handler = RegisterHTMLHandler(Util.adaptor(args));
     if (sre) SpeechHandler(handler, new MathML());
 
     //
@@ -92,6 +91,13 @@ export const Direct = {
       //
       if (args.font && args.font !== 'mathjax-newcm') {
         Util.fontData = Object.values(await Util.import(`@mathjax/${args.font}-font/js/${args.output}.js`))[0];
+      }
+      //
+      // Create the adaptor() function (alternate DOMs provide their own versions
+      //
+      if (!Util.altDOM) {
+        const {liteAdaptor} = await Util.import('@mathjax/src/js/adaptors/liteAdaptor.js');
+        Util.adaptor = (args) => Util.adjustAdaptor(liteAdaptor(Util.config.adaptor(args)), args);
       }
     },
   }
