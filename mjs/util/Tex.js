@@ -76,7 +76,7 @@ export const Tex = {
         alias: 'E',
         boolean: true,
         default: true,
-        describe: 'TeX errors are reportred rather than processed.',
+        describe: 'TeX errors are reported rather than processed.',
       },
       'tex-html': {
         boolean: true,

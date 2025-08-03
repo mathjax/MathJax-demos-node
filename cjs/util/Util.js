@@ -567,7 +567,7 @@ const Util = exports.Util = {
    */
   async convert(args, lib, document) {
     //
-    // If the lib is the Typeset library, use its output libray as the
+    // If the lib is the Typeset library, use its output library as the
     // util and itself to get the conversion options, otherwise use
     // lib as the util and Util as to get the conversion options.
     //
