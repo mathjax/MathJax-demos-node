@@ -1,7 +1,0 @@
-{
-  "webpack": {
-    "name": "[jsdom]/jsdomAdaptor",
-    "libs": ["components/mjs/core/lib"],
-    "dist": "."
-  }
-}

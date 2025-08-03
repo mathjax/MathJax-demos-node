@@ -30,12 +30,8 @@ export const Linkedom = {
   
   hooks: {
     loader(_args, config) {
-      config.paths.linkedom = new URL('./linkedomAdaptor', import.meta.url).pathname;
-      const i = config.load.indexOf('adaptors/liteDOM');
-      if (i >= 0) {
-        config.load.splice(i, 1);
-      }
-      config.load.unshift('[linkedom]/linkedomAdaptor');
+      config.load = config.load.filter((name) => name !== 'adaptors/liteDOM');
+      config.load.unshift('adaptors/linkedom');
     },
 
     typeset(_args, config) {

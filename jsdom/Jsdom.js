@@ -30,12 +30,8 @@ export const Jsdom = {
   
   hooks: {
     loader(_args, config) {
-      config.paths.jsdom = new URL('./jsdomAdaptor', import.meta.url).pathname;
-      const i = config.load.indexOf('adaptors/liteDOM');
-      if (i >= 0) {
-        config.load.splice(i, 1);
-      }
-      config.load.unshift('[jsdom]/jsdomAdaptor');
+      config.load = config.load.filter((name) => name !== 'adaptors/liteDOM');
+      config.load.unshift('adaptors/jsdom');
     },
 
     typeset(_args, config) {

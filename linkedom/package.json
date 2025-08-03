@@ -15,8 +15,5 @@
     "type": "git",
     "url": "https://github.com/mathjax/MathJax-demos-node/"
   },
-  "scripts": {
-    "make-adaptor": "cd linkedomAdaptor && node ../../node_modules/@mathjax/src/components/bin/pack"
-  },
   "license": "Apache-2.0"
 }

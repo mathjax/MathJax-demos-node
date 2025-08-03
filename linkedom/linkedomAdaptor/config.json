@@ -1,7 +1,0 @@
-{
-  "webpack": {
-    "name": "[linkedom]/linkedomAdaptor",
-    "libs": ["components/mjs/core/lib"],
-    "dist": "."
-  }
-}
