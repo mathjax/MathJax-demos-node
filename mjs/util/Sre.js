@@ -49,16 +49,22 @@ export const Sre = {
         default: false,
         describe: 'Whether to include braille labels.',
       },
+      semantics: {
+        boolean: true,
+        default: false,
+        describe: 'Keep the data-semantic attributes.',
+      },
       sre: {
         array: true,
         nargs: 2,
         describe: 'SRE flags as key value pairs, e.g., "--sre locale de --sre domain mathspeak" ' +
           'generates speech in German with mathspeak rules.',
       },
-      semantics: {
-        boolean: true,
-        default: false,
-        describe: 'Keep the data-semantic attributes.',
+      mathmaps: {
+        alias: 'M',
+        requireArg: true,
+        default: Util.puppet ? 'https://cdn.jsdelivr.net/npm/mathjax@4.0.0-rc.4/sre/mathmaps' : '[sre]/mathmaps',
+        describe: 'Location for SRE math maps (URL or node package reference).',
       },
     };
   },
@@ -104,6 +110,16 @@ export const Sre = {
           enableBraille: args.braille,
           sre: Sre.config(args),
         });
+      }
+    },
+
+    /**
+     * @param {OptionList} args     The command-line options
+     * @param {OptionList} config   The current Loader configuration
+     */
+    loader(args, config) {
+      if (args.mathmaps) {
+        config.paths.mathmaps = args.mathmaps;
       }
     },
   },

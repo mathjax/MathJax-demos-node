@@ -48,7 +48,7 @@ export const Svg = {
     '.mjx-dashed{stroke-dasharray:140}',
     '.mjx-dotted{stroke-linecap:round;stroke-dasharray:0,140}',
     'use[data-c]{stroke-width:3px}'
-  ].join(''),
+  ],
 
   /**
    * The command-line arguments for SVG output.
@@ -132,15 +132,23 @@ export const Svg = {
     }
     //
     // Get the global <defs> element, if needed.
-    let DEFS = '';
+    //
+    let CSS = this.CSS.join('');
     if (defs && args['font-cache'] === 'global') {
       const global = document.outputJax.fontCache.defs;
-      DEFS = '<svg>' + adaptor.serializeXML(global).replace(/(<path|<\/defs)/g, '\n$1') + '</svg>';
+      SVG = '<svg>' + adaptor.serializeXML(global).replace(/(<path|<\/defs)/g, '\n$1') + '</svg>' + SVG;
+      CSS = this.CSS.join('\n');
+    }
+    //
+    // Add the CSS styles, if requested
+    //
+    if (args.styles) {
+      SVG = SVG.replace(/<defs>/, `<defs>\n${CSS}`);
     }
     //
     // Return the defs plus the SVG output.
     //
-    return DEFS + SVG;
+    return SVG;
   },
 
   /**

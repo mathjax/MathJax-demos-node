@@ -440,8 +440,8 @@ export const Mml = {
   /**
    * Filter MML output based on the command-line options.
    *
-   * @param {LiteElement} node        The output node to filter
-   * @param {OptionList} args      The command-line options
+   * @param {MmlNode} node            The output node to filter
+   * @param {OptionList} args         The command-line options
    * @param {boolean} _               True to include CSS output, if requested (unused for MathML)
    * @param {MathDocument} document   The MathDocument containing the node
    * @returns {string}                The serialized CSS and HTML.

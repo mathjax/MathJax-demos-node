@@ -38,6 +38,7 @@ const Util = exports.Util = {
   mixed: false,   // True for mixed tools
   all: false,     // True for typeset tools
   altDOM: false,  // True if an alternative to LiteDOM is used
+  puppet: false,  // True in puppeteer
 
   /**
    * Hooks to be called for various actions.
@@ -103,6 +104,10 @@ const Util = exports.Util = {
       }
       if (Util.altDOM) {
         delete options.entities;
+      }
+      if (Util.puppet) {
+        options.dist.hidden = true;
+        options.dist.default = true;
       }
       return options;
     },
@@ -335,12 +340,15 @@ const Util = exports.Util = {
         .options(options)
         .alias('h', 'help')
         .alias('v', 'version')
+        .showHidden(false)
         .check((args) => {
           if (args.file) {
             if (args._.length) {
               throw Error('You may not provide equations when a file is specified');
             }
-            args.file = Util.read(args.file);
+            if (!Util.puppet) {
+              args.file = Util.read(args.file);
+            }
           }
           if (Array.isArray(args.file)) {
             throw Error('You may only provide a single file to process');
@@ -355,6 +363,15 @@ const Util = exports.Util = {
     args.output ??= this.output;
     if (!args.file) {
       args.math = args._;
+      //
+      // If no expressions, get them from stdin.
+      //
+      if (args.math.length === 0) {
+        if (!args.quiet) {
+          console.log('Enter equations to be typeset separated by blank lines:');
+        }
+        args.math = Util.read('-').trim().split(/\n\n+/);
+      }
     }
     //
     // Load source components, if requested.
@@ -564,28 +581,20 @@ const Util = exports.Util = {
    * @param {OptionList} args         The command-line options
    * @param {object} lib              The output format's utility library object
    * @param {MathDocument} document   The MathDocument used for the conversion
+   * @param {OptionList} options      The conversion options
    */
-  async convert(args, lib, document) {
+  async convert(args, lib, document, options) {
     //
     // If the lib is the Typeset library, use its output library as the
     // util and itself to get the conversion options, otherwise use
     // lib as the util and Util as to get the conversion options.
     //
     const [util, convert] = lib.util ? [lib.util[args.output], lib] : [lib, Util];
+    options ??= convert.convertOptions(args);
     //
     // Check if there is a MathML vistor to use.
     //
     const visitor = util.output?.visitor;
-    //
-    // Get the list of expressions to convert.  If not, get them from stdin.
-    //
-    let list = args.math;
-    if (list.length === 0) {
-      if (!args.quiet) {
-        console.log('Enter equations to be typeset separated by blank lines:');
-      }
-      list = Util.read('-').trim().split(/\n\n+/);
-    }
     //
     // Make sure MathJax is ready;
     //
@@ -594,11 +603,11 @@ const Util = exports.Util = {
       document = MathJax.startup.document;
     }
     //
-    // Convert the list using the document and filter the result using
+    // Convert the math list using the document and filter the result using
     // the util.filter() method.
     //
     const math = [];
-    for (const item of list) {
+    for (const item of args.math) {
       try {
         const options = convert.convertOptions(args);
         const node = await document.convertPromise(String(item), options);
@@ -626,8 +635,9 @@ const Util = exports.Util = {
    * @param {OptionList} args         The command-line options
    * @param {object} lib              The output format's utility library object
    * @param {MathDocument} document   The MathDocument used for the conversion
+   * @param {OptionList} options      The conversion options
    */
-  async typeset(args, lib, document) {
+  async typeset(args, lib, document, options) {
     //
     // Make sure MathJax is ready;
     //
@@ -650,6 +660,6 @@ const Util = exports.Util = {
     //
     // For expression conversion, call the convert method.
     //
-    return (await Util.convert(args, lib, document));
+    return (await Util.convert(args, lib, document, options));
   },
 };

@@ -57,12 +57,22 @@ export const Am = {
    * @param {OptionList} args   The command-line options
    */
   config(args) {
-    if (!args['allow-inline']) return {};
+    if (!args['allow-inline'] || !args.file) return {};
     //
-    // When allow-inline is specified, we overreide the AsciiMath input jax's
-    // compile function in order to handle the inline vs. display rendering.
+    // Set the delimiters to use for AsciiMath.
     //
-    Util.addHook('ready', () => {
+    return {
+      delimiters: [['``', '``'], ['`', '`']],
+    };
+  },
+
+  hooks: {
+    ready(args) {
+      if (!args['allow-inline'] || !args.file) return;
+      //
+      // When allow-inline is specified, we overreide the AsciiMath input jax's
+      // compile function in order to handle the inline vs. display rendering.
+      //
       Am.AsciiMath ??= MathJax._.input.asciimath_ts.AsciiMath;
       Object.assign(Am.AsciiMath.prototype, {
         _compile: Am.AsciiMath.prototype.compile,
@@ -87,12 +97,6 @@ export const Am = {
           return result;
         }
       });
-    });
-    //
-    // Set the delimiters to use for AsciiMath.
-    //
-    return {
-      delimiters: [['``', '``'], ['`', '`']],
-    };
-  },
+    }
+  }
 };
