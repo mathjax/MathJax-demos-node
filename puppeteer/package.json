@@ -1,11 +1,11 @@
 {
   "name": "mathjax-puppeteer",
-  "version": "3.2.0",
-  "description": "MathJax v3 running in headless Chrome via puppeteer",
+  "version": "4.0.0",
+  "description": "MathJax v4 running in headless Chrome via puppeteer",
+  "type": "module",
   "dependencies": {
-    "mathjax-full": "^3.2.0",
-    "puppeteer": "^9.0.0",
-    "yargs": "^17.0.1"
+    "puppeteer": "^24.15.0",
+    "yargs": "17.7.2"
   },
   "repository": {
     "type": "git",
