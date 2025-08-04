@@ -1,14 +1,14 @@
-# MathJax Using JSDOM
+# MathJax Using LINKEDOM
 
 This example shows how to run MathJax within a
-[JSDOM](https://github.com/jsdom/jsdom) instance.  Although MathJax
-provides a lightweight DOM implementation (called LiteDOM) for use in
-node applications, it is limited in its scope, and you may want to
-work within a more full-featured DOM.  For example, if you plan to
-manipulate the DOM as though you were using a browser, it may be more
-convenient to to use JSDOM than LiteDOM.  Note, however, that because
-JSDOM implements a lot more of the DOM functionality, it is slower and
-larger.
+[LINKEDOM](https://github.com/WebReflection/linkedom#readme) instance.
+Although MathJax provides a lightweight DOM implementation (called
+LiteDOM) for use in node applications, it is limited in its scope, and
+you may want to work within a more full-featured DOM.  For example, if
+you plan to manipulate the DOM as though you were using a browser, it
+may be more convenient to to use LINKEDOM than LiteDOM.  Note,
+however, that because LINKEDOM implements a lot more of the DOM
+functionality, it is slower and larger.
 
 ## The Examples
 
@@ -22,22 +22,22 @@ three input formats that MathJax supports (TeX/LaTeX, MathML, or
 AsciiMath), and any of its output formats (CHTML, SVG, or MathML).
 
 These work essentially the same as the corresponding mjs examples, but
-they load the `adaptors/jsdom` adaptor rather than the
-`adaptors/liteDOM` adaptor.  The jsdom adaptor requires that you load
-the JSDOM node module and pass that to the adaptor when it is created.
-These details are encapsulated in the [`Jsdom.js`](Jsdom.js) utility
+they load the `adaptors/linkedom` adaptor rather than the
+`adaptors/liteDOM` adaptor.  The linkedom adaptor requires that you load
+the LINKEDOM node module and pass that to the adaptor when it is created.
+These details are encapsulated in the [`Linkedom.js`](Linkedom.js) utility
 file.  The rest of the work is done by the utility files in
 [`mjs/util`](../mjs/util).
 
 ## Installation
 
 In order to try out these examples you must install its dependencies.
-Since the code relies on JSDOM, that needs to be installed, so this
+Since the code relies on LINKEDOM, that needs to be installed, so this
 directory contains a separate `package.json` file, and you should do
 the following:
 
 ``` bash
-cd MathJax-demos-node/jsdom
+cd MathJax-demos-node/linkedom
 npm install
 ```
 
@@ -58,5 +58,5 @@ node <example-name> --help
 
 for details about other options.
 
-The `adaptors/jsdom` adaptor is now standard in v4, so you don't need
+The `adaptors/linkedom` adaptor is now standard in v4, so you don't need
 to built is by hand, as you did in v3.

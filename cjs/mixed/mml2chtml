@@ -1,0 +1,72 @@
+#! node
+
+/*************************************************************************
+ *
+ *  cjs/mixed/mml2chtml
+ *
+ *  Uses MathJax v4 to convert a MathML string to an HTML string.
+ *
+ * ----------------------------------------------------------------------
+ *
+ *  Copyright (c) 2025 The MathJax Consortium
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+//
+// Load the packages needed for MathJax.
+//
+const {Loader} = require('@mathjax/src/js/components/loader.js');
+const {MathML} = require('@mathjax/src/js/input/mathml.js');
+const {CHTML} = require('@mathjax/src/js/output/chtml.js');
+
+//
+// Load the associated components and mark them as loaded.
+//
+require('@mathjax/src/components/js/input/mml/mml.js');
+require('@mathjax/src/components/js/output/chtml/chtml.js');
+
+Loader.preLoaded('input/mathml', 'output/chtml');
+
+//
+// Load the needed utilities.
+//
+const {Mixed} = require('../util/Mixed.js');
+const {Util} = require('../util/Util.js');
+const {Mml} = require('../util/Mml.js');
+const {Chtml} = require('../util/Chtml.js');
+const {Sre} = require('../util/Sre.js');
+
+//
+// Get the command-line arguments.
+//
+const args = Util.args('"math" > file.html', [Mml.input, Chtml, Sre, Mixed]);
+
+//
+// Create the input and output jax.
+//
+const mml = new MathML(Mml.input.config(args));
+const chtml = new CHTML(Chtml.config(args));
+
+//
+// Create the MathDocument with the input and output jax.
+//
+const document = Mixed.document(mml, chtml, args);
+
+//
+// Typeset the math and print the result.
+// Then tell MathJax we are done.
+//
+Util.typeset(args, Chtml, document)
+  .then((output) => console.log(output))
+  .then(() => document.done());

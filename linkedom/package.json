@@ -1,12 +1,11 @@
 {
-  "name": "MathJax-demos-node",
+  "name": "MathJax-linkdom",
   "version": "4.0.0",
-  "description": "Demos using MathJax v4 in node",
+  "description": "MathJax v4 running in a linkedom instance",
   "dependencies": {
-    "@mathjax/mathjax-newcm-font": "^4.0.0",
-    "@mathjax/src": "^4.0.0",
-    "yargs": "^18.0.0"
+    "linkedom": "^0.18.11"
   },
+  "type": "module",
   "devDependencies": {
     "terser-webpack-plugin": "^5.3.14",
     "webpack": "^5.100.1",
@@ -16,10 +15,5 @@
     "type": "git",
     "url": "https://github.com/mathjax/MathJax-demos-node/"
   },
-  "keywords": [
-    "MathJax",
-    "examples",
-    "nodejs"
-  ],
   "license": "Apache-2.0"
 }

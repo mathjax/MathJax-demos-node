@@ -1,0 +1,64 @@
+#! node
+
+/*************************************************************************
+ *
+ *  cjs/mixed/typeset
+ *
+ *  Uses MathJax v4 to convert any of its formats to any of its output types.
+ *
+ * ----------------------------------------------------------------------
+ *
+ *  Copyright (c) 2025 The MathJax Consortium
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+//
+// Load the needed utilities.
+//
+const {Mixed} = require('../util/Mixed.js');
+const {Typeset} = require('../util/Typeset.js');
+const {Util} = require('../util/Util.js');
+const {Tex} = require('../util/Tex.js');
+const {Mml} = require('../util/Mml.js');
+const {Am} = require('../util/Am.js');
+const {Chtml} = require('../util/Chtml.js');
+const {Svg} = require('../util/Svg.js');
+const {Sre} = require('../util/Sre.js');
+
+//
+// Get the command-line arguments.
+//
+const args = Util.args(
+  '"math or filename" > file',
+  [Typeset, Tex, Mml.input, Am, Chtml, Svg, Mml.output, Sre, Mixed]
+);
+
+//
+// Create input and output jax.
+//
+const input = Typeset.create.input(args);
+const output = Typeset.create.output(args);
+
+//
+// Create the MathDocument with the input and output jax.
+//
+const document = Mixed.document(input, output, args);
+
+//
+// Produce the output for the requested format.
+// Then tell MathJax we are done.
+//
+Util.typeset(args, Typeset, document)
+  .then((output) => console.log(output))
+  .then(() => document.done());

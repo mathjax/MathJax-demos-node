@@ -1,0 +1,64 @@
+#! node
+
+/*************************************************************************
+ *
+ *  cjs/simple/am2mml
+ *
+ *  Uses MathJax v4 to convert an AsciiMath string to a MathML string.
+ *
+ * ----------------------------------------------------------------------
+ *
+ *  Copyright (c) 2019-2025 The MathJax Consortium
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+//
+// Load MathJax.
+//
+const MathJax = require('@mathjax/src/source');
+
+//
+// Load the needed utilities.
+//
+const {Util} = require('../util/Util.js');
+const {Am} = require('../util/Am.js');
+const {Mml} = require('../util/Mml.js');
+
+//
+// Allow the use of "await" in the main code
+//
+(async () => {
+
+  //
+  // Get the command-line arguments.
+  //
+  const args = Util.args('"math"', [Am, Mml.output], false);
+
+  //
+  // Load and initialize MathJax.
+  //
+  await MathJax.init({
+    loader:    Util.config.loader(['input/asciimath'], args),
+    options:   Util.config.options(args),
+    startup:   Util.config.startup(args),
+    asciimath: Am.config(args),
+    'adaptors/liteDOM': Util.config.adaptor(args),
+  });
+
+  //
+  // Convert and print the math.
+  //
+  console.log(await Util.typeset(args, Mml));
+
+})();
