@@ -63,7 +63,7 @@ export const Sre = {
       mathmaps: {
         alias: 'M',
         requireArg: true,
-        default: Util.puppet ? 'https://cdn.jsdelivr.net/npm/mathjax@4.0.0-rc.4/sre/mathmaps' : '[sre]/mathmaps',
+        default: Util.puppet ? 'https://cdn.jsdelivr.net/npm/mathjax@4/sre/mathmaps' : '[sre]/mathmaps',
         describe: 'Location for SRE math maps (URL or node package reference).',
       },
     };

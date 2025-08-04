@@ -3,8 +3,8 @@
   "version": "4.0.0",
   "description": "Demos using MathJax v4 in node",
   "dependencies": {
-    "@mathjax/mathjax-newcm-font": "4.0.0-rc.4",
-    "@mathjax/src": "^4.0.0-rc.4",
+    "@mathjax/mathjax-newcm-font": "^4.0.0",
+    "@mathjax/src": "^4.0.0",
     "yargs": "^18.0.0"
   },
   "devDependencies": {

@@ -44,7 +44,7 @@ export const Chtml = {
     const options = {
       ...Util.options.output,
       fontURL: {
-        default: 'https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.0.0-rc.4/chtml/woff2',
+        default: 'https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4/chtml/woff2',
         describe: 'The URL to use for web fonts.',
       },
       css: {
