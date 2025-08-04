@@ -26,7 +26,8 @@ they load the `adaptors/jsdom` adaptor rather than the
 `adaptors/liteDOM` adaptor.  The jsdom adaptor requires that you load
 the JSDOM node module and pass that to the adaptor when it is created.
 These details are encapsulated in the [`Jsdom.js`](Jsdom.js) utility
-file.
+file.  The rest of the work is done by the utility files in
+[`mjs/util`](../mjs/util).
 
 ## Installation
 
