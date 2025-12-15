@@ -531,7 +531,7 @@ const Util = exports.Util = {
       //
       if ((!args['include-latex'] && (name == 'data-latex' || name === 'data-latex-item')) ||
           (!args.semantics &&
-           name.match(/^(?:data-semantic-.*|data-speech-node|data-(?:speech|braille)-attached|aria-level)$/))) {
+           name.match(/^(?:data-semantic-.*|data-speech-node|data-(?:speech|braille)-attached)$/))) {
         adaptor.removeAttribute(node, name);
       }
     }
@@ -557,9 +557,13 @@ const Util = exports.Util = {
     if (!args._speech && !args._braille) return;
     if (args._speech) {
       adaptor.setAttribute(node, 'aria-label', args._speech);
+      adaptor.setAttribute(node, 'role', 'img');
+      adaptor.setAttribute(node, 'aria-roledescription', '\u0091'); // not spoken by screen readers
     }
     if (args._braille) {
       adaptor.setAttribute(node, 'aria-braillelabel', args._braille);
+      adaptor.setAttribute(node, 'role', 'img');
+      adaptor.setAttribute(node, 'aria-brailleroledescription', 'math');
     }
     //
     // For SVG, find the math node, for CHTML use all children,
