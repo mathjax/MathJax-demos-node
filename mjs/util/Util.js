@@ -415,6 +415,9 @@ export const Util = {
    * Import a file with error reporting.
    */
   import(name) {
+    if (name.match(/^[a-z]:[/\\]/)) {
+      name = 'file://' + name;
+    }
     return import(name).catch((err) => Util.fail(err.message));
   },
 

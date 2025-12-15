@@ -176,7 +176,7 @@ export const Tex = {
         const file = readdirSync(dir).find((name) => name.endsWith('Configuration.js'));
         promises.push(Util.import(`${dir}/${file}`));
       } else {
-        Uti.error(`Unknown TeX package: ${name}`);
+        Util.error(`Unknown TeX package: ${name}`);
       }
     }
     //
