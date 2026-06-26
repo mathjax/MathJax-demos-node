@@ -34,9 +34,9 @@ const {SVG} = require('@mathjax/src/js/output/svg.js');
 // Load the associated components and mark them as loaded.
 //
 require('@mathjax/src/components/js/input/mml/mml.js');
-require('@mathjax/src/components/js/output/chtml/chtml.js');
+require('@mathjax/src/components/js/output/svg/svg.js');
 
-Loader.preLoaded('input/mathml', 'output/chtml');
+Loader.preLoaded('input/mathml', 'output/svg');
 
 //
 // Load the needed utilities.
