@@ -22,7 +22,7 @@ that exhibit the features of MathJax.  The tools provide a number of
 command-line options, which you can discover by using the `--help`
 option when running them.  Most of the examples include the ability to
 generate speech strings for the output, for example, via the
-`--speech` or ``--braille` options, and the language can be specified
+`--speech` or `--braille` options, and the language can be specified
 using `--sre locale de`, for example to get a German localization.
 
 The tools accept one or more mathematical expressions as their
